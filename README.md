@@ -15,8 +15,30 @@ An iOS application for easy professor-student appointment scheduling that was bu
 - Backend: Dart with MongoDB
 - Design: Minimalist UI
   
-## Getting Started
-- Clone the repo.
-- Run flutter pub get.
-- Set up MongoDB and configure the connection.
-- Run flutter run.
+# Getting Started
+
+This guide walks you through setting up the SWE-MeetMe, which consists of:
+
+- Frontend: Flutter app (Dart)
+- Backend: FastAPI (Python) with MongoDB
+
+### Prerequisites
+
+Ensure you have the following installed before proceeding:
+
+#### Frontend (Flutter) Requirements:
+- Flutter
+- Dart (included with Flutter)
+
+#### Backend (FastAPI) Requirements:
+
+- Python 3.8+
+- MongoDB
+- FastAPI
+- Uvicorn (ASGI server)
+
+### 1. Clone the Repository
+```
+$ git clone https://github.com/Dr4kerKH/SWE_MeetMe.git .
+cd SWE_MeetMe
+```
