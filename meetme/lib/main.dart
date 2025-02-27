@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'api_service.dart'; // Import at the top
 
 void main() {
   runApp(const MyApp());
@@ -157,14 +158,28 @@ class ConfirmationPage extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {
-                // Handle appointment confirmation logic here
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Appointment booked successfully!'),
-                  ),
-                );
-                Navigator.pop(context); // Go back to the booking page
+              onPressed: () async {
+                try {
+                  await ApiService.createAppointment(
+                    "John Doe", // Replace with actual user input if needed
+                    "Educator A",
+                    DateTime(
+                    selectedDate.year,
+                    selectedDate.month,
+                    selectedDate.day,
+                    selectedTime.hour,
+                    selectedTime.minute,
+                    ),
+                  );
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Appointment booked successfully!')),
+                  );
+                  Navigator.pop(context); // Return to the previous page
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Error: ${e.toString()}')),
+                  );
+                }
               },
               child: const Text('Confirm Booking'),
             ),
