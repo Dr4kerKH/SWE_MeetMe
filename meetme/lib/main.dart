@@ -74,28 +74,7 @@ class _BookingAppointmentPageState extends State<BookingAppointmentPage> {
             const SizedBox(height: 20),
 
             // Time Picker
-            ElevatedButton(
-              onPressed: () async {
-                final TimeOfDay? pickedTime = await showTimePicker(
-                  context: context,
-                  initialTime: TimeOfDay.now(),
-                );
-                if (pickedTime != null) {
-                  setState(() {
-                    _selectedTime = pickedTime;
-                  });
-                }
-              },
-              child: Text(
-                _selectedTime == null
-                    ? 'Select Time'
-                    : 'Selected Time: ${_selectedTime!.format(context)}',
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // Confirm Button
-            ElevatedButton(
+           ElevatedButton(
               onPressed: () {
                 if (_selectedDate == null || _selectedTime == null) {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -104,6 +83,13 @@ class _BookingAppointmentPageState extends State<BookingAppointmentPage> {
                     ),
                   );
                 } else {
+                  // Provide dynamic or static values for the following fields
+                  String studentName = 'John Doe'; // Replace with actual student name
+                  String studentEmail = 'johndoe@example.com'; // Replace with actual student email
+                  String courseId = 'CS101'; // Replace with actual course ID
+                  String courseName = 'Intro to Computer Science'; // Replace with actual course name
+                  String professorName = 'Prof. Smith'; // Replace with actual professor name
+
                   // Navigate to confirmation screen
                   Navigator.push(
                     context,
@@ -111,6 +97,11 @@ class _BookingAppointmentPageState extends State<BookingAppointmentPage> {
                       builder: (context) => ConfirmationPage(
                         selectedDate: _selectedDate!,
                         selectedTime: _selectedTime!,
+                        studentName: studentName,
+                        studentEmail: studentEmail,
+                        courseId: courseId,
+                        courseName: courseName,
+                        professorName: professorName,
                       ),
                     ),
                   );
@@ -129,11 +120,21 @@ class _BookingAppointmentPageState extends State<BookingAppointmentPage> {
 class ConfirmationPage extends StatelessWidget {
   final DateTime selectedDate;
   final TimeOfDay selectedTime;
+  final String studentName;
+  final String studentEmail;
+  final String courseId;
+  final String courseName;
+  final String professorName;
 
   const ConfirmationPage({
     super.key,
     required this.selectedDate,
     required this.selectedTime,
+    required this.studentName,
+    required this.studentEmail,
+    required this.courseId,
+    required this.courseName,
+    required this.professorName,
   });
 
   @override
@@ -161,14 +162,17 @@ class ConfirmationPage extends StatelessWidget {
               onPressed: () async {
                 try {
                   await ApiService.createAppointment(
-                    "John Doe", // Replace with actual user input if needed
-                    "Educator A",
-                    DateTime(
-                    selectedDate.year,
-                    selectedDate.month,
-                    selectedDate.day,
-                    selectedTime.hour,
-                    selectedTime.minute,
+                    studentName: studentName,
+                    studentEmail: studentEmail,
+                    courseId: courseId,
+                    courseName: courseName,
+                    professorName: professorName,
+                    dateTime: DateTime(
+                      selectedDate.year,
+                      selectedDate.month,
+                      selectedDate.day,
+                      selectedTime.hour,
+                      selectedTime.minute,
                     ),
                   );
                   ScaffoldMessenger.of(context).showSnackBar(
