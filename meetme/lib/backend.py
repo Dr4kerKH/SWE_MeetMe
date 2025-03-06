@@ -15,7 +15,7 @@ from model import User, UserResponse, Appointment, AppointmentResponse, Class, C
 load_dotenv()
 app = FastAPI()
 
-# Database Connection
+############################ Database Connection ############################
 MONGODB_URI = os.getenv("MONGODB_URI")
 if not MONGODB_URI:
     raise ValueError("MONGODB_URI is not set in the .env file")
@@ -26,13 +26,13 @@ users_collection = db['users']
 appointments_collection = db['appointments']
 classes_collection = db['classes']
 
-# Security Setup
+############################ Security Setup ############################
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 SECRET_KEY = os.getenv("SECRET_KEY", "your_secret_key")
 ALGORITHM = "HS256"
 
-# Helper Functions
+############################ Helper Functions ############################
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
@@ -43,7 +43,10 @@ def create_access_token(data: dict):
     to_encode = data.copy()
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
-# API Endpoints
+
+############################ API Endpoints ############################
+#######################################################################
+# Post Requests
 @app.post("/accounts", response_model=UserResponse)
 async def create_account(user: User):
     if users_collection.find_one({"email": user.email}):
@@ -53,17 +56,29 @@ async def create_account(user: User):
     user_dict = user.dict()
     user_dict["password"] = hashed_password
     users_collection.insert_one(user_dict)
+
     return UserResponse(email=user.email, username=user.username, role=user.role)
 
 @app.post("/login")
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     user = users_collection.find_one({"email": form_data.username})
     if not user or not verify_password(form_data.password, user['password']):
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+        raise HTTPException(status_code=401, detail="Invalid password")
     
     token = create_access_token(data={"sub": user['email']})
+
     return {"access_token": token, "token_type": "bearer"}
 
+@app.post("/appointments", response_model=AppointmentResponse)
+async def create_appointment(appointment: Appointment):
+    appointment_dict = appointment.dict()
+    appointment_dict["appointment_date"] = appointment.appointment_date.isoformat()
+    result = appointments_collection.insert_one(appointment_dict)
+    appointment_dict["id"] = str(result.inserted_id)
+    
+    return appointment_dict
+
+# Get Requests
 @app.get("/classes", response_model=List[ClassResponse])
 async def get_classes():
     classes = list(classes_collection.find())
@@ -88,14 +103,6 @@ async def get_appointments():
     
     return [{"id": str(app["_id"]), **app} for app in appointments]
 
-@app.post("/appointments", response_model=AppointmentResponse)
-async def create_appointment(appointment: Appointment):
-    appointment_dict = appointment.dict()
-    appointment_dict["appointment_date"] = appointment.appointment_date.isoformat()
-    result = appointments_collection.insert_one(appointment_dict)
-    appointment_dict["id"] = str(result.inserted_id)
-    return appointment_dict
-
 @app.get("/appointments/{appointment_id}", response_model=AppointmentResponse)
 async def get_appointment_by_id(appointment_id: str):
     appointment = appointments_collection.find_one({"_id": ObjectId(appointment_id)})
@@ -103,3 +110,5 @@ async def get_appointment_by_id(appointment_id: str):
         raise HTTPException(status_code=404, detail="Appointment not found")
     
     return {"id": str(appointment["_id"]), **appointment}
+
+# Put Requests
