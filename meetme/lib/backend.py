@@ -1,114 +1,190 @@
-# main.py
+# Import necessary libraries and modules
 import os
-from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, Depends
-from pymongo import MongoClient
-from datetime import datetime
-from typing import List
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from passlib.context import CryptContext
-import jwt
-from bson import ObjectId
-from model import User, UserResponse, Appointment, AppointmentResponse, Class, ClassResponse  # Import models
+from dotenv import load_dotenv  # Load environment variables from .env file
+from fastapi import FastAPI, HTTPException, Depends  # FastAPI framework for building APIs
+from pymongo import MongoClient  # MongoDB client for database interactions
+from datetime import datetime  # For handling date and time
+from typing import List  # For type hinting lists in API responses
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm  # Authentication handling
+from passlib.context import CryptContext  # Password hashing for security
+import jwt  # JSON Web Token for authentication
+from bson import ObjectId  # To work with MongoDB Object IDs
+from model import User, UserResponse, Appointment, AppointmentResponse, Class, ClassResponse  # Import Pydantic models
 
-# Load environment variables from .env
+# Load environment variables (e.g., database connection URI, secret key)
 load_dotenv()
 app = FastAPI()
 
 ############################ Database Connection ############################
+# Fetch MongoDB URI from environment variables
 MONGODB_URI = os.getenv("MONGODB_URI")
 if not MONGODB_URI:
-    raise ValueError("MONGODB_URI is not set in the .env file")
+    raise ValueError("MONGODB_URI is not set in the .env file")  # Ensure the database connection string is provided
 
+# Establish connection with MongoDB
 client = MongoClient(MONGODB_URI)
-db = client['appointmentDB']
-users_collection = db['users']
-appointments_collection = db['appointments']
-classes_collection = db['classes']
+db = client['appointmentDB']  # Use 'appointmentDB' database
+users_collection = db['users']  # Users collection
+appointments_collection = db['appointments']  # Appointments collection
+classes_collection = db['classes']  # Classes collection
 
 ############################ Security Setup ############################
+# OAuth2 authentication scheme
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+# Password hashing configuration using bcrypt
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-SECRET_KEY = os.getenv("SECRET_KEY", "your_secret_key")
-ALGORITHM = "HS256"
+
+# JWT Secret Key and Algorithm
+SECRET_KEY = os.getenv("SECRET_KEY", "your_secret_key")  # Default key (should be changed in production)
+ALGORITHM = "HS256"  # Secure hashing algorithm for JWT
 
 ############################ Helper Functions ############################
 def verify_password(plain_password, hashed_password):
+    """Verify if a given plain password matches the stored hashed password."""
     return pwd_context.verify(plain_password, hashed_password)
 
 def get_password_hash(password):
+    """Hash a password using bcrypt."""
     return pwd_context.hash(password)
 
 def create_access_token(data: dict):
+    """Generate a JWT access token with the provided user data."""
     to_encode = data.copy()
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
-
 ############################ API Endpoints ############################
 #######################################################################
-# Post Requests
+# Post Requests (Creating new records)
+
 @app.post("/accounts", response_model=UserResponse)
 async def create_account(user: User):
+    """
+    Create a new user account.
+    - Ensures the email is unique.
+    - Hashes the password before storing.
+    """
     if users_collection.find_one({"email": user.email}):
         raise HTTPException(status_code=400, detail="Email already registered")
     
-    hashed_password = get_password_hash(user.password)
+    hashed_password = get_password_hash(user.password)  # Hash the password
     user_dict = user.dict()
-    user_dict["password"] = hashed_password
-    users_collection.insert_one(user_dict)
+    user_dict["password"] = hashed_password  # Store the hashed password
+    users_collection.insert_one(user_dict)  # Insert the new user into the database
 
-    return UserResponse(email=user.email, username=user.username, role=user.role)
+    return UserResponse(email=user.email, username=user.username, role=user.role)  # Return user info without password
 
 @app.post("/login")
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    """
+    Authenticate user and return a JWT access token.
+    - Checks if the email exists in the database.
+    - Verifies the password.
+    - Generates a JWT token on successful authentication.
+    """
     user = users_collection.find_one({"email": form_data.username})
     if not user or not verify_password(form_data.password, user['password']):
         raise HTTPException(status_code=401, detail="Invalid password")
     
-    token = create_access_token(data={"sub": user['email']})
-
-    return {"access_token": token, "token_type": "bearer"}
+    token = create_access_token(data={"sub": user['email']})  # Create JWT token
+    return {"access_token": token, "token_type": "bearer"}  # Return token
 
 @app.post("/appointments", response_model=AppointmentResponse)
 async def create_appointment(appointment: Appointment):
+    """
+    Create a new appointment.
+    - Converts the date to ISO format before storing.
+    """
     appointment_dict = appointment.dict()
-    appointment_dict["appointment_date"] = appointment.appointment_date.isoformat()
-    result = appointments_collection.insert_one(appointment_dict)
-    appointment_dict["id"] = str(result.inserted_id)
-    
-    return appointment_dict
+    appointment_dict["appointment_date"] = appointment.appointment_date.isoformat()  # Convert date to string
+    result = appointments_collection.insert_one(appointment_dict)  # Insert into database
+    appointment_dict["id"] = str(result.inserted_id)  # Convert ObjectId to string for API response
 
-# Get Requests
+    return appointment_dict  # Return the newly created appointment
+
+@app.post("/classes", response_model=ClassResponse)
+async def create_class(cls: Class):
+    """
+    Create a new class entry.
+    - Ensures the course ID is unique.
+    """
+    if classes_collection.find_one({"course_id": cls.course_id}):
+        raise HTTPException(status_code=400, detail="Course ID already exists")
+
+    class_dict = cls.dict()
+    result = classes_collection.insert_one(class_dict)  # Insert class into the database
+    class_dict["id"] = str(result.inserted_id)  # Convert ObjectId to string for response
+
+    return class_dict  # Return the created class details
+
+#######################################################################
+# Get Requests (Retrieving records)
+
 @app.get("/classes", response_model=List[ClassResponse])
 async def get_classes():
-    classes = list(classes_collection.find())
+    """
+    Retrieve all available classes.
+    - Returns a list of all classes.
+    """
+    classes = list(classes_collection.find())  # Fetch all classes
     if not classes:
         raise HTTPException(status_code=404, detail="No classes found")
     
-    return [{"id": str(cls["_id"]), **cls} for cls in classes]
+    return [{"id": str(cls["_id"]), **cls} for cls in classes]  # Convert ObjectId to string and return
 
 @app.get("/classes/{course_id}", response_model=ClassResponse)
 async def get_class_by_id(course_id: str):
+    """
+    Retrieve details of a class by course ID.
+    """
     cls = classes_collection.find_one({"course_id": course_id})
     if not cls:
         raise HTTPException(status_code=404, detail="Class not found")
     
-    return {"id": str(cls["_id"]), **cls}
+    return {"id": str(cls["_id"]), **cls}  # Convert ObjectId to string and return
 
 @app.get("/appointments", response_model=List[AppointmentResponse])
 async def get_appointments():
-    appointments = list(appointments_collection.find())
+    """
+    Retrieve all appointments.
+    - Returns a list of all scheduled appointments.
+    """
+    appointments = list(appointments_collection.find())  # Fetch all appointments
     if not appointments:
         raise HTTPException(status_code=404, detail="No appointments found")
     
-    return [{"id": str(app["_id"]), **app} for app in appointments]
+    return [{"id": str(app["_id"]), **app} for app in appointments]  # Convert ObjectId to string and return
 
 @app.get("/appointments/{appointment_id}", response_model=AppointmentResponse)
 async def get_appointment_by_id(appointment_id: str):
+    """
+    Retrieve an appointment by its ID.
+    """
     appointment = appointments_collection.find_one({"_id": ObjectId(appointment_id)})
     if not appointment:
         raise HTTPException(status_code=404, detail="Appointment not found")
     
-    return {"id": str(appointment["_id"]), **appointment}
+    return {"id": str(appointment["_id"]), **appointment}  # Convert ObjectId to string and return
 
+@app.get("/get_schedule", response_model=List[AppointmentResponse])
+async def get_schedule(date: str):
+    """
+    Retrieve all appointments scheduled for a specific date.
+    - Validates the date format.
+    - Returns all appointments on that day.
+    """
+    try:
+        # Validate if the date is in the correct format
+        datetime.strptime(date, "%Y-%m-%d")
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid date format. Use YYYY-MM-DD")
+
+    appointments = list(appointments_collection.find({"appointment_date": date}))  # Fetch appointments by date
+
+    if not appointments:
+        raise HTTPException(status_code=404, detail="No scheduled appointments for this day")
+
+    return [{"id": str(app["_id"]), **app} for app in appointments]  # Convert ObjectId to string and return
+
+#######################################################################
 # Put Requests
