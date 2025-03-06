@@ -31,3 +31,6 @@ class Class(BaseModel):
 
 class ClassResponse(Class):
     id: str
+    course_id: str
+    course_name: str
+    professor_name: str

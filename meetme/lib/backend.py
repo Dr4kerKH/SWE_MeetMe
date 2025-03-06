@@ -3,7 +3,7 @@ import os
 from dotenv import load_dotenv  # Load environment variables from .env file
 from fastapi import FastAPI, HTTPException, Depends  # FastAPI framework for building APIs
 from pymongo import MongoClient  # MongoDB client for database interactions
-from datetime import datetime  # For handling date and time
+from datetime import datetime, timedelta  # For handling date and time
 from typing import List  # For type hinting lists in API responses
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm  # Authentication handling
 from passlib.context import CryptContext  # Password hashing for security
@@ -94,13 +94,22 @@ async def create_appointment(appointment: Appointment):
     """
     Create a new appointment.
     - Converts the date to ISO format before storing.
+    - Ensures the appointment duration is exactly 30 minutes.
     """
+    # Calculate the end time of the appointment
+    start_time = appointment.appointment_date
+    end_time = start_time + timedelta(minutes=30)
+    
+    # Check if the duration is exactly 30 minutes
+    if (end_time - start_time).total_seconds() != 1800:
+        raise HTTPException(status_code=400, detail="Appointment duration must be exactly 30 minutes")
+    
     appointment_dict = appointment.dict()
-    appointment_dict["appointment_date"] = appointment.appointment_date.isoformat()  # Convert date to string
+    appointment_dict["appointment_date"] = start_time.isoformat()  # Convert date to string
     result = appointments_collection.insert_one(appointment_dict)  # Insert into database
     appointment_dict["id"] = str(result.inserted_id)  # Convert ObjectId to string for API response
 
-    return appointment_dict  # Return the newly created appointment
+    return {"id": appointment_dict["id"], "appointment_date": start_time.isoformat()}  # Return the newly created appointment
 
 @app.post("/classes", response_model=ClassResponse)
 async def create_class(cls: Class):
