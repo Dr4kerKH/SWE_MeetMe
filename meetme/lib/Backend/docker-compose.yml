@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8000:80"
+    environment:
+      MONGODB_URI: "your_mongodb_uri"
+      SECRET_KEY: "your_secret_key"
+    volumes:
+      - .:/app

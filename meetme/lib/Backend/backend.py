@@ -15,6 +15,11 @@ from model import User, UserResponse, Appointment, AppointmentResponse, Class, C
 load_dotenv()
 app = FastAPI()
 
+############################ Running with uvicorn ############################
+# uvicorn backend:app --host 0.0.0.0 --port 8080 --reload
+############################ #################### ############################
+
+
 ############################ Database Connection ############################
 # Fetch MongoDB URI from environment variables
 MONGODB_URI = os.getenv("MONGODB_URI")
@@ -59,14 +64,18 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
         user_email = payload.get("sub")
         if user_email is None:
             raise HTTPException(status_code=401, detail="Invalid token")
-        return user_email
+        user = users_collection.find_one({"email": user_email})
+        if user is None:
+            raise HTTPException(status_code=401, detail="User not found")
+        
+        return {"email": user_email, "role": user["role"]}
     except jwt.PyJWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
 
 ############################ API Endpoints ############################
 #######################################################################
-# Post Requests (Creating new records)
 
+# Post Requests (Creating new records)
 @app.post("/accounts", response_model=UserResponse)
 async def create_account(user: User):
     """
@@ -138,7 +147,6 @@ async def create_class(cls: Class):
 
 #######################################################################
 # Get Requests (Retrieving records)
-
 @app.get("/classes", response_model=List[ClassResponse])
 async def get_classes():
     """
@@ -207,3 +215,35 @@ async def get_schedule(date: str):
 
 #######################################################################
 # Put Requests
+
+#######################################################################
+# Delete Requests
+@app.delete("/classes/{course_id}", response_model=dict)
+async def delete_class(course_id: str, current_user: dict = Depends(get_current_user)):
+    """
+    Delete a class by its course ID.
+    - Only accessible by professors.
+    """
+    if current_user["role"] != "professor":
+        raise HTTPException(status_code=403, detail="Not authorized to delete classes")
+
+    result = classes_collection.delete_one({"course_id": course_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Class not found")
+
+    return {"message": "Class deleted successfully"}
+
+@app.delete("/appointments/{appointment_id}", response_model=dict)
+async def delete_appointment(appointment_id: str, current_user: dict = Depends(get_current_user)):
+    """
+    Delete an appointment by its ID.
+    - Only accessible by professors.
+    """
+    if current_user["role"] != "professor":
+        raise HTTPException(status_code=403, detail="Not authorized to delete appointments")
+
+    result = appointments_collection.delete_one({"_id": ObjectId(appointment_id)})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Appointment not found")
+
+    return {"message": "Appointment deleted successfully"}

@@ -1,36 +1,39 @@
 # models.py
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from datetime import datetime
 
 class User(BaseModel):
-    email: str
+    """Model representing a user."""
+    email: EmailStr
     username: str
     password: str
     role: str  # "professor" or "student"
 
 class UserResponse(BaseModel):
-    email: str
+    """Model for user response without password."""
+    email: EmailStr
     username: str
     role: str
 
 class Appointment(BaseModel):
+    """Model representing an appointment."""
     student_name: str
-    student_email: str
+    student_email: EmailStr
     course_id: str
     course_name: str
     professor_name: str
     appointment_date: datetime
 
 class AppointmentResponse(Appointment):
+    """Model for appointment response with an ID."""
     id: str
 
 class Class(BaseModel):
+    """Model representing a class."""
     course_id: str
     course_name: str
     professor_name: str
 
 class ClassResponse(Class):
+    """Model for class response with an ID."""
     id: str
-    course_id: str
-    course_name: str
-    professor_name: str
