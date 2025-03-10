@@ -1,4 +1,5 @@
 # Import necessary libraries and modules
+import logging
 import os
 from dotenv import load_dotenv  # Load environment variables from .env file
 from fastapi import FastAPI, HTTPException, Depends  # FastAPI framework for building APIs
@@ -14,6 +15,7 @@ from model import User, UserResponse, Appointment, AppointmentResponse, Class, C
 # Load environment variables (e.g., database connection URI, secret key)
 load_dotenv()
 app = FastAPI()
+logging.basicConfig(level=logging.INFO) # Set up logging for debugging and information purposes
 
 ############################ Running with uvicorn ############################
 # uvicorn backend:app --host 0.0.0.0 --port 8080 --reload
@@ -23,8 +25,17 @@ app = FastAPI()
 ############################ Database Connection ############################
 # Fetch MongoDB URI from environment variables
 MONGODB_URI = os.getenv("MONGODB_URI")
+SECRET_KEY = os.getenv("SECRET_KEY")
+
+# Log the MongoDB URI and Secret Key for debugging purposes
+#logging.info(f"MONGODB_URI: {MONGODB_URI}")
+#logging.info(f"SECRET_KEY: {SECRET_KEY}")
+
+# Ensure the MongoDB URI is provided
 if not MONGODB_URI:
     raise ValueError("MONGODB_URI is not set in the .env file")  # Ensure the database connection string is provided
+if not SECRET_KEY:
+    raise ValueError("SECRET_KEY is not set in the .env file")
 
 # Establish connection with MongoDB
 client = MongoClient(MONGODB_URI)
@@ -41,7 +52,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # JWT Secret Key and Algorithm
-SECRET_KEY = os.getenv("SECRET_KEY", "your_secret_key")  # Default key (should be changed in production)
+# SECRET_KEY = os.getenv("SECRET_KEY", "your_secret_key")  # Default key (should be changed in production)
 ALGORITHM = "HS256"  # Secure hashing algorithm for JWT
 
 ############################ Helper Functions ############################
@@ -74,6 +85,9 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
 
 ############################ API Endpoints ############################
 #######################################################################
+@app.get("/")
+async def read_root():
+    return {"message": "Welcome to the FastAPI application!"}
 
 # Post Requests (Creating new records)
 @app.post("/accounts", response_model=UserResponse)
