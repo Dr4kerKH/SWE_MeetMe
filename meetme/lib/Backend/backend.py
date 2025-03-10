@@ -3,7 +3,7 @@ import logging
 import os
 from dotenv import load_dotenv  # Load environment variables from .env file
 from fastapi import FastAPI, HTTPException, Depends  # FastAPI framework for building APIs
-from pymongo import MongoClient  # MongoDB client for database interactions
+from pymongo import MongoClient   # MongoDB client for database interactions
 from datetime import datetime, timedelta  # For handling date and time
 from typing import List  # For type hinting lists in API responses
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm  # Authentication handling
@@ -11,6 +11,7 @@ from passlib.context import CryptContext  # Password hashing for security
 import jwt  # JSON Web Token for authentication
 from bson import ObjectId  # To work with MongoDB Object IDs
 from model import User, UserResponse, Appointment, AppointmentResponse, Class, ClassResponse  # Import Pydantic models
+from pymongo.server_api import ServerApi
 
 # Load environment variables (e.g., database connection URI, secret key)
 load_dotenv()
@@ -26,19 +27,17 @@ logging.basicConfig(level=logging.INFO) # Set up logging for debugging and infor
 # Fetch MongoDB URI from environment variables
 MONGODB_URI = os.getenv("MONGODB_URI")
 SECRET_KEY = os.getenv("SECRET_KEY")
-
-# Log the MongoDB URI and Secret Key for debugging purposes
-#logging.info(f"MONGODB_URI: {MONGODB_URI}")
-#logging.info(f"SECRET_KEY: {SECRET_KEY}")
-
-# Ensure the MongoDB URI is provided
-if not MONGODB_URI:
-    raise ValueError("MONGODB_URI is not set in the .env file")  # Ensure the database connection string is provided
-if not SECRET_KEY:
-    raise ValueError("SECRET_KEY is not set in the .env file")
+MONGODB_USERNAME = os.getenv("MONGODB_USERNAME")
+MONGODB_PASSWORD = os.getenv("MONGODB_PASSWORD")
 
 # Establish connection with MongoDB
-client = MongoClient(MONGODB_URI)
+client = MongoClient(MONGODB_URI, server_api = ServerApi('1'))  # Connect to MongoDB using the provided URI
+try:
+    client.admin.command('ping')
+    print("Pinged your deployment. You successfully connected to MongoDB!")
+except Exception as e:
+    print(e)
+
 db = client['appointmentDB']  # Use 'appointmentDB' database
 users_collection = db['users']  # Users collection
 appointments_collection = db['appointments']  # Appointments collection
