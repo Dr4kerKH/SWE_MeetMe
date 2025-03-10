@@ -38,7 +38,7 @@ try:
 except Exception as e:
     print(e)
 
-db = client['appointmentDB']  # Use 'appointmentDB' database
+db = client['MeetMeDB']  # Use 'MeetMeDB' database
 users_collection = db['users']  # Users collection
 appointments_collection = db['appointments']  # Appointments collection
 classes_collection = db['classes']  # Classes collection
