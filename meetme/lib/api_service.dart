@@ -1,11 +1,22 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  // static const String baseUrl = 'http://192.168.x.x:8000'; // Replace with your IP to run Backend on here for physical devices to connect
-  static const String baseUrl = 'http://localhost:8000'; // Use localhost for local testing within a machine
+  // Change base URL accordingly
+  static const String baseUrl = 'http://127.0.0.1:8000'; // Local testing
+  // static const String baseUrl = 'http://192.168.x.x:8000'; // Use LAN IP for physical devices
+  
+  static Future<void> saveToken(String token) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('token', token);
+  }
 
-  // Create an account (either professor or student)
+  static Future<String?> getToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('token');
+  }
+
   static Future<void> createAccount(String email, String username, String password, String role) async {
     final response = await http.post(
       Uri.parse('$baseUrl/accounts'),
@@ -18,60 +29,59 @@ class ApiService {
       }),
     );
 
-    if (response.statusCode != 201) {
-      throw Exception('Failed to create account');
+    if (response.statusCode != 200) {
+      throw Exception('Failed to create account: ${response.body}');
     }
   }
 
-  // User login (Returns user details if successful)
-  static Future<Map<String, dynamic>> login(String email, String password) async {
-    final response = await http.post(Uri.parse('$baseUrl/login'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        "email": email,
+  static Future<String> login(String email, String password) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/login'),
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+      body: {
+        "username": email,
         "password": password,
-      }),
+      },
     );
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body); // Expected to return user details (e.g., token, role)
+      final data = jsonDecode(response.body);
+      final token = data['access_token'];
+      await saveToken(token); // Store token for future use
+      return token;
     } else {
-      throw Exception('Invalid email or password');
+      throw Exception('Failed to log in: ${response.body}');
     }
   }
 
-  // Get list of all classes
-  static Future<List<dynamic>> getClasses() async {
-    final response = await http.get(Uri.parse('$baseUrl/classes'));
+  static Future<List<Map<String, dynamic>>> getClasses() async {
+    final token = await getToken();
+    final response = await http.get(
+      Uri.parse('$baseUrl/classes'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
     if (response.statusCode == 200) {
-      final List<dynamic> data = jsonDecode(response.body);
-      return data.map((className) => className.toString()).toList();
+      return List<Map<String, dynamic>>.from(jsonDecode(response.body));
     } else {
-      throw Exception('Failed to load class details');
+      throw Exception('Failed to fetch classes: ${response.body}');
     }
   }
 
-  // Get details of a specific class by course_id
-  static Future<Map<String, dynamic>> getClassDetails(String courseId) async {
-    final response = await http.get(Uri.parse('$baseUrl/classes/$courseId'));
+  static Future<Map<String, dynamic>> getClassById(String courseId) async {
+    final token = await getToken();
+    final response = await http.get(
+      Uri.parse('$baseUrl/classes/$courseId'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
     } else {
-      throw Exception('Failed to load class details');
+      throw Exception('Failed to fetch class: ${response.body}');
     }
   }
 
-  // Get all appointments
-  static Future<List<dynamic>> getAppointments() async {
-    final response = await http.get(Uri.parse('$baseUrl/appointments'));
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body);
-    } else {
-      throw Exception('Failed to load appointments');
-    }
-  }
-
-  // Create an appointment
   static Future<void> createAppointment({
     required String studentName,
     required String studentEmail,
@@ -80,21 +90,62 @@ class ApiService {
     required String professorName,
     required DateTime dateTime,
   }) async {
+    final url = Uri.parse('$baseUrl/appointments');
     final response = await http.post(
-      Uri.parse('$baseUrl/appointments'),
-      headers: {'Content-Type': 'application/json'},
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: jsonEncode({
-        "student_name": studentName,
-        "student_email": studentEmail,
-        "course_id": courseId,
-        "course_name": courseName,
-        "professor_name": professorName,
-        "appointment_date": dateTime.toIso8601String(),
+        'studentName': studentName,
+        'studentEmail': studentEmail,
+        'courseId': courseId,
+        'courseName': courseName,
+        'professorName': professorName,
+        'appointment_date': dateTime.toIso8601String(),
       }),
     );
 
-    if (response.statusCode != 201) {
+    if (response.statusCode != 200) {
       throw Exception('Failed to create appointment');
+    }
+  }
+
+  static Future<List<Map<String, dynamic>>> getAppointments() async {
+    final token = await getToken();
+    final response = await http.get(
+      Uri.parse('$baseUrl/appointments'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode == 200) {
+      return List<Map<String, dynamic>>.from(jsonDecode(response.body));
+    } else {
+      throw Exception('Failed to fetch appointments: ${response.body}');
+    }
+  }
+
+  static Future<void> deleteAppointment(String appointmentId) async {
+    final token = await getToken();
+    final response = await http.delete(
+      Uri.parse('$baseUrl/appointments/$appointmentId'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to delete appointment: ${response.body}');
+    }
+  }
+
+  static Future<void> deleteClass(String courseId) async {
+    final token = await getToken();
+    final response = await http.delete(
+      Uri.parse('$baseUrl/classes/$courseId'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to delete class: ${response.body}');
     }
   }
 }

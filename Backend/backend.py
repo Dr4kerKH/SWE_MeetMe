@@ -63,9 +63,11 @@ def get_password_hash(password):
     """Hash a password using bcrypt."""
     return pwd_context.hash(password)
 
-def create_access_token(data: dict):
+def create_access_token(data: dict, expires_delta: timedelta = timedelta(hours=1)):
     """Generate a JWT access token with the provided user data."""
     to_encode = data.copy()
+    expire = datetime.utcnow() + expires_delta
+    to_encode.update({"exp": expire})  # Add expiration time to token
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 def get_current_user(token: str = Depends(oauth2_scheme)):
