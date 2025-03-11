@@ -1,0 +1,8 @@
+fastapi
+pydantic
+uvicorn
+python-dotenv
+pymongo
+passlib[bcrypt]
+bcrypt==3.2.0
+pyjwt
