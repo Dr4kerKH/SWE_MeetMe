@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-// import 'package:table_calendar/table_calendar.dart';
-import 'package:google_nav_bar/google_nav_bar.dart';
+import 'student_pages.dart';
 
 void main() {
   runApp(const MeetMeApp());
@@ -73,7 +72,14 @@ class LoadingScreenState extends State<LoadingScreen> {
             builder: (BuildContext context, ScrollController scrollController) {
               return Container(
                 decoration: const BoxDecoration(
-                  color: Color.fromARGB(235, 235, 45, 10),
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Color.fromARGB(255, 255, 0, 0),
+                      Color.fromARGB(235, 201, 133, 124),
+                    ]
+                  ),
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(35),
                     topRight: Radius.circular(35),
@@ -93,12 +99,12 @@ class LoadingScreenState extends State<LoadingScreen> {
                             Text(
                               _isSignUp ? 'Create Account' : 'Sign In',
                               style: const TextStyle(
-                                color: Color.fromARGB(255, 50, 50, 50),
+                                color: Color.fromARGB(255, 250, 250, 250),
                                 fontSize: 28,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            const SizedBox(height: 20),
+                            const SizedBox(height: 10),
                             if (_isSignUp && !_isProfessor && !_isStudent) ...[
                               GestureDetector(
                                 onTap: () {
@@ -109,11 +115,11 @@ class LoadingScreenState extends State<LoadingScreen> {
                                 },
                                 child: Row(
                                   children: [
-                                    const Icon(Icons.arrow_back_ios, color: Color.fromARGB(255, 50, 50, 50),),
+                                    const Icon(Icons.arrow_back_ios, color: Color.fromARGB(255, 250, 250, 250),),
                                     const Text(
                                       'Back',
                                       style: TextStyle(
-                                        color: Color.fromARGB(255, 50, 50, 50),
+                                        color: Color.fromARGB(255, 250, 250, 250),
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -352,7 +358,7 @@ class LoadingScreenState extends State<LoadingScreen> {
                                     color: Color.fromARGB(255, 0, 0, 0),
                                     fontSize: 15,
                                     fontFamily: 'Poppins',
-                                    fontWeight: FontWeight.w400,
+                                    fontWeight: FontWeight.w800,
                                   ),
                                 ),
                                 const SizedBox(width: 5),
@@ -399,73 +405,6 @@ class LoadingScreenState extends State<LoadingScreen> {
             },
           ),
         ],
-      ),
-    );
-  }
-}
-
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
-
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color.fromARGB(235, 255, 255, 255),
-        title: const Text(
-          'Home',
-          style: TextStyle(
-            color: Color.fromARGB(255, 50, 50, 50),
-            fontSize: 24,
-            fontFamily: 'Poppins',
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        centerTitle: true,
-      ),
-      body: Container(
-        color: const Color.fromARGB(235, 255, 151, 133),
-        child: const Center(
-          child: Text('Hello, world!',
-          style: TextStyle(
-            color: Color.fromARGB(255, 0, 0, 0),
-            fontSize: 36,
-            fontFamily: 'Poppins',
-            fontWeight: FontWeight.w500,
-          ),
-          ),
-        ),
-      ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 0),
-        child: GNav(
-          backgroundColor: const Color.fromARGB(235, 255, 255, 255),
-          gap: 8,
-          padding: EdgeInsets.all(16),
-          tabs: const [
-            GButton(
-              icon: Icons.home_outlined,
-              text: 'Home',
-            ),
-            GButton(
-              icon: Icons.calendar_today_outlined,
-              text: 'Calendar',
-            ),
-            GButton(
-              icon: Icons.search_outlined,
-              text: 'Search',
-            ), 
-            GButton(
-              icon: Icons.settings_outlined,
-              text: 'Profile',
-            ),  
-          ],
-        ),
       ),
     );
   }

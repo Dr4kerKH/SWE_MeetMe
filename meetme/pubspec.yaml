@@ -36,6 +36,8 @@ dependencies:
   table_calendar: ^3.0.0
   cupertino_icons: ^1.0.8
   google_nav_bar: ^5.0.6
+  smooth_page_indicator: ^1.0.0
+  date_picker_timeline: ^1.2.4
 
 dev_dependencies:
   flutter_test:
