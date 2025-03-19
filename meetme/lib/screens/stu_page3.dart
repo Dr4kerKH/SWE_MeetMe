@@ -13,7 +13,6 @@ class _StudentPage3State extends State<StudentPage3> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
         title: const Text(
           'Meet Me',
           style: TextStyle(
@@ -24,14 +23,15 @@ class _StudentPage3State extends State<StudentPage3> {
           ),
         ),
         centerTitle: true,
+        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       ),
       body: Container(
         color: const Color.fromARGB(255, 255, 255, 255),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-            const SizedBox(height: 20.0),
-            Container(
+        child: Column(
+          children: [
+            const SizedBox(height: 10.0),
+            SingleChildScrollView(
+            child: Container(
               padding: const EdgeInsets.all(12.0),
               child: DatePicker(
                 DateTime.now(),
@@ -42,16 +42,34 @@ class _StudentPage3State extends State<StudentPage3> {
                 selectedTextColor: const Color.fromARGB(255, 255, 255, 255),
                 locale: 'en_US',
                 daysCount: 14,
-                onDateChange: (date) {
+                onDateChange: (date) {},
                   // New date selected
                   //print(date);
-                },
+              ),
+            ),
+            ),
+            const SizedBox(height: 10.0),
+            const Text(
+              'Select a time slot',
+              style: TextStyle(
+                fontSize: 20,
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.w600,
+                color: Color.fromARGB(255, 50, 50, 50),
+              ),
+            ),
+            const Text(
+              'syncfusion_flutter_calendar',
+              style: TextStyle(
+                fontSize: 20,
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.w600,
+                color: Color.fromARGB(255, 50, 50, 50),
               ),
             ),
           ],
         ),
       ),
-    ),
     );
   }
 }
