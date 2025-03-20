@@ -1,5 +1,4 @@
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-//import 'package:table_calendar/table_calendar.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'screens/stu_page1.dart';
@@ -22,8 +21,13 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      /*appBar: AppBar(
-        backgroundColor: const Color.fromARGB(235, 255, 255, 255),
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.person_rounded, color: Color.fromARGB(255, 50, 50, 50)),
+            onPressed: () {
+              // Handle user profile action
+            },
+        ),
         title: const Text(
           'Meet Me',
           style: TextStyle(
@@ -34,7 +38,16 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         centerTitle: true,
-      ),*/
+        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout_rounded, color: Color.fromARGB(255, 50, 50, 50)),
+            onPressed: () {
+              // Handle logout
+            },
+          ),
+        ],
+      ),
       body: Stack(
         children: [
           PageView(
@@ -56,7 +69,7 @@ class _HomePageState extends State<HomePage> {
             alignment: Alignment(0, 0.97),
             child: SmoothPageIndicator(
               controller: _controller,
-              count: 5,
+              count: 4,
               effect: WormEffect(
                 dotHeight: 10,
                 dotWidth: 10,
@@ -93,13 +106,13 @@ class _HomePageState extends State<HomePage> {
               ),
             GButton(
               icon: Icons.dashboard_customize_rounded, 
-              text: 'Calendar',
+              text: 'Appointments',
               iconActiveColor: Color.fromARGB(255, 0, 0, 0),
               iconColor: Color.fromARGB(255, 179, 179, 179),
               ),
             GButton(
-              icon: Icons.add_circle_rounded, 
-              text: 'Appointment',
+              icon: Icons.storage_rounded, 
+              text: 'Calendar',
               iconActiveColor: Color.fromARGB(255, 0, 0, 0),
               iconColor: Color.fromARGB(255, 179, 179, 179),
             ),
@@ -109,12 +122,12 @@ class _HomePageState extends State<HomePage> {
               iconActiveColor: Color.fromARGB(255, 0, 0, 0),
               iconColor: Color.fromARGB(255, 179, 179, 179),
               ),  
-            GButton(
+            /*GButton(
               icon: Icons.person_rounded, 
               text: 'Profile',
               iconActiveColor: Color.fromARGB(255, 0, 0, 0),
               iconColor: Color.fromARGB(255, 179, 179, 179),
-              ),  
+              ), */ 
           ],
         ),
       ),

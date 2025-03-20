@@ -38,6 +38,7 @@ dependencies:
   google_nav_bar: ^5.0.6
   smooth_page_indicator: ^1.0.0
   date_picker_timeline: ^1.2.4
+  syncfusion_flutter_calendar: ^28.2.12
 
 dev_dependencies:
   flutter_test:

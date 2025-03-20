@@ -30,9 +30,11 @@ class LoadingScreen extends StatefulWidget {
 }
 
 class LoadingScreenState extends State<LoadingScreen> {
+  
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passController = TextEditingController();
   final TextEditingController _userController = TextEditingController();
+  
   bool _isPasswordVisible = false;
   bool _isSignUp = false;
   bool _isProfessor = false;
@@ -133,7 +135,7 @@ class LoadingScreenState extends State<LoadingScreen> {
                                   'Are you a Professor or a Student?',
                                   style: TextStyle(
                                     color: Color.fromARGB(255, 255, 255, 255),
-                                    fontSize: 28,
+                                    fontSize: 24,
                                     fontWeight: FontWeight.bold,
                                   ),
                                   textAlign: TextAlign.center,
