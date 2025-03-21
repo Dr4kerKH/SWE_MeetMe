@@ -5,6 +5,7 @@ import 'screens/stu_page1.dart';
 import 'screens/stu_page2.dart';
 import 'screens/stu_page3.dart';
 import 'screens/stu_page4.dart';
+import 'main.dart';
 //import 'screens/stu_page5.dart';
 
 class HomePage extends StatefulWidget {
@@ -23,17 +24,17 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
        centerTitle: true,
-        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         leading: IconButton(
-          icon: const Icon(Icons.person_rounded, color: Color.fromARGB(255, 50, 50, 50)),
+          icon: Icon(Icons.person_rounded, color: Theme.of(context).shadowColor),
             onPressed: () {
               // Handle user profile action
             },
         ),
-        title: const Text(
+        title: Text(
           'Meet Me',
           style: TextStyle(
-            color: Color.fromARGB(255, 50, 50, 50),
+            color: Theme.of(context).shadowColor,
             fontSize: 24,
             fontFamily: 'Poppins',
             fontWeight: FontWeight.w600,
@@ -41,9 +42,14 @@ class _HomePageState extends State<HomePage> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout_rounded, color: Color.fromARGB(255, 50, 50, 50)),
+            icon: Icon(Icons.logout_rounded, color: Theme.of(context).shadowColor),
             onPressed: () {
               // Handle logout
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => const LoadingScreen()),
+                (Route<dynamic> route) => false,
+              );
             },
           ),
         ],
@@ -73,17 +79,17 @@ class _HomePageState extends State<HomePage> {
               effect: WormEffect(
                 dotHeight: 10,
                 dotWidth: 10,
-                activeDotColor: const Color.fromARGB(255, 0, 0, 0),
-                dotColor: const Color.fromARGB(255, 179, 179, 179),
+                activeDotColor: Theme.of(context).shadowColor,
+                dotColor: Theme.of(context).hintColor,
               ),
             ),
           ),
         ],
       ),
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 0),
+        padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 0),
         child: GNav(
-          backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           gap: 8,
           padding: EdgeInsets.all(16),
           selectedIndex: _bottomNavIndex,
@@ -97,36 +103,36 @@ class _HomePageState extends State<HomePage> {
               );
             });
           },
-          tabs: const [
+          tabs: [
             GButton(
               icon: Icons.home_filled,
               text: 'Home',
-              iconActiveColor: Color.fromARGB(255, 0, 0, 0),
-              iconColor: Color.fromARGB(255, 179, 179, 179),
+              iconActiveColor: Theme.of(context).shadowColor,
+              iconColor: Theme.of(context).hintColor,
               ),
             GButton(
               icon: Icons.dashboard_customize_rounded, 
               text: 'Appointments',
-              iconActiveColor: Color.fromARGB(255, 0, 0, 0),
-              iconColor: Color.fromARGB(255, 179, 179, 179),
+              iconActiveColor: Theme.of(context).shadowColor,
+              iconColor: Theme.of(context).hintColor,
               ),
             GButton(
               icon: Icons.storage_rounded, 
               text: 'Calendar',
-              iconActiveColor: Color.fromARGB(255, 0, 0, 0),
-              iconColor: Color.fromARGB(255, 179, 179, 179),
+              iconActiveColor: Theme.of(context).shadowColor,
+              iconColor: Theme.of(context).hintColor,
             ),
             GButton(
               icon: Icons.message_rounded, 
               text: 'Chat',
-              iconActiveColor: Color.fromARGB(255, 0, 0, 0),
-              iconColor: Color.fromARGB(255, 179, 179, 179),
+              iconActiveColor: Theme.of(context).shadowColor,
+              iconColor: Theme.of(context).hintColor,
               ),  
             /*GButton(
               icon: Icons.person_rounded, 
               text: 'Profile',
-              iconActiveColor: Color.fromARGB(255, 0, 0, 0),
-              iconColor: Color.fromARGB(255, 179, 179, 179),
+              iconActiveColor: Theme.of(context).shadowColor,
+              iconColor: Theme.of(context).hintColor,
               ), */ 
           ],
         ),

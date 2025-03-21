@@ -13,7 +13,7 @@ class _StudentPage2State extends State<StudentPage2> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        color: const Color.fromARGB(255, 255, 255, 255),
+        color: Theme.of(context).scaffoldBackgroundColor,
         child: Column(
           children: [
             const SizedBox(height: 10.0),
@@ -26,8 +26,8 @@ class _StudentPage2State extends State<StudentPage2> {
                 height: 120,
                 width: 60,
                 initialSelectedDate:  DateTime.now(),
-                selectionColor: const Color.fromARGB(255, 250, 101, 101),
-                selectedTextColor: const Color.fromARGB(255, 255, 255, 255),
+                selectionColor: Theme.of(context).primaryColor,
+                selectedTextColor: Theme.of(context).scaffoldBackgroundColor,
                 locale: 'en_US',
                 daysCount: 14,
                 onDateChange: (date) {

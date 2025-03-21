@@ -12,9 +12,20 @@ class MeetMeApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Booking Appointment',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+      title: 'Meet Me',
+      theme: ThemeData( // Color Collections
+        // ** How to get the colors from the theme?
+        // Theme.of(context).primaryColor,
+        // Theme.of(context).secondaryHeaderColor,
+        // Theme.of(context).hintColor,
+        // Theme.of(context).scaffoldBackgroundColor,
+        // Theme.of(context).shadowColor,
+        primaryColor: const Color.fromARGB(255, 77, 11, 21), // Primary color
+        secondaryHeaderColor: const Color.fromARGB(255, 140, 22, 39), // Secondary color
+        hintColor: const Color.fromARGB(255, 82, 82, 82), // Grey color
+        scaffoldBackgroundColor: const Color.fromARGB(255, 235, 235, 235), // Background color
+        shadowColor: const Color.fromARGB(255, 10, 10, 10), // Shadow color
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 255, 255, 255)),
         useMaterial3: true,
       ),
       home: const LoadingScreen(),
@@ -55,13 +66,13 @@ class LoadingScreenState extends State<LoadingScreen> {
         children: [
           // Background color
           Container(
-            color: const Color.fromARGB(255, 255, 255, 255),
+            color: Theme.of(context).scaffoldBackgroundColor,
           ),
           Padding(
             padding: EdgeInsets.only(bottom: MediaQuery.of(context).size.height * 0.26),
             child: Center(
               child: Image.asset(
-                'assets/m2-meetme.png',
+                'assets/logo-png.png',
                 width: 350, // Adjust the width as needed
                 height: 350, // Adjust the height as needed
               ),
@@ -73,16 +84,16 @@ class LoadingScreenState extends State<LoadingScreen> {
             maxChildSize: 0.5,
             builder: (BuildContext context, ScrollController scrollController) {
               return Container(
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
+                    begin: Alignment.topRight,
+                    end: Alignment.bottomLeft,
                     colors: [
-                      Color.fromARGB(255, 255, 0, 0),
-                      Color.fromARGB(235, 201, 133, 124),
+                      Theme.of(context).primaryColor,
+                      Theme.of(context).secondaryHeaderColor,
                     ]
                   ),
-                  borderRadius: BorderRadius.only(
+                  borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(35),
                     topRight: Radius.circular(35),
                   ),
@@ -100,8 +111,8 @@ class LoadingScreenState extends State<LoadingScreen> {
                           children: [
                             Text(
                               _isSignUp ? 'Create Account' : 'Sign In',
-                              style: const TextStyle(
-                                color: Color.fromARGB(255, 250, 250, 250),
+                              style: TextStyle(
+                                color: Theme.of(context).scaffoldBackgroundColor,
                                 fontSize: 28,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -117,11 +128,11 @@ class LoadingScreenState extends State<LoadingScreen> {
                                 },
                                 child: Row(
                                   children: [
-                                    const Icon(Icons.arrow_back_ios, color: Color.fromARGB(255, 250, 250, 250),),
-                                    const Text(
+                                    Icon(Icons.arrow_back_ios, color: Theme.of(context).scaffoldBackgroundColor,),
+                                    Text(
                                       'Back',
                                       style: TextStyle(
-                                        color: Color.fromARGB(255, 250, 250, 250),
+                                        color: Theme.of(context).scaffoldBackgroundColor,
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -131,10 +142,10 @@ class LoadingScreenState extends State<LoadingScreen> {
                               ),
                               const SizedBox(height: 20),
                               Center(
-                                child: const Text(
+                                child: Text(
                                   'Are you a Professor or a Student?',
                                   style: TextStyle(
-                                    color: Color.fromARGB(255, 255, 255, 255),
+                                    color: Theme.of(context).scaffoldBackgroundColor,
                                     fontSize: 24,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -155,11 +166,11 @@ class LoadingScreenState extends State<LoadingScreen> {
                                       });
                                       },
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: const Color.fromARGB(255, 225, 225, 230),
+                                        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                                       ),
-                                      child: const Text('Professor',
+                                      child: Text('Professor',
                                         style: TextStyle(
-                                          color: Color.fromARGB(255, 10, 10, 10),
+                                          color: Theme.of(context).shadowColor,
                                           fontSize: 24,
                                           fontFamily: 'Poppins',
                                           fontWeight: FontWeight.w500,
@@ -183,11 +194,11 @@ class LoadingScreenState extends State<LoadingScreen> {
                                       });
                                       },
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: const Color.fromARGB(255, 225, 225, 230),
+                                        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                                       ),
-                                      child: const Text('Student',
+                                      child: Text('Student',
                                         style: TextStyle(
-                                          color: Color.fromARGB(255, 10, 10, 10),
+                                          color: Theme.of(context).shadowColor,
                                           fontSize: 24,
                                           fontFamily: 'Poppins',
                                           fontWeight: FontWeight.w500,
@@ -200,19 +211,19 @@ class LoadingScreenState extends State<LoadingScreen> {
                             ] else ...[
                             TextField(
                               controller: _emailController,
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                color: Color.fromARGB(255, 255, 255, 255),
-                                fontSize: 15,
+                              textAlign: TextAlign.left,
+                              style: TextStyle(
+                                color: Theme.of(context).scaffoldBackgroundColor,
+                                fontSize: 18,
                                 fontFamily: 'Poppins',
                                 fontWeight: FontWeight.w500,
                               ),
-                              decoration: const InputDecoration(
-                                prefixIcon: Icon(Icons.email_outlined, color: Colors.white),
-                                labelText: 'Email',
-                                labelStyle: TextStyle(
-                                  color: Color.fromARGB(255, 255, 255, 255),
-                                  fontSize: 15,
+                              decoration: InputDecoration(
+                                prefixIcon: Icon(Icons.email_outlined, color: Theme.of(context).scaffoldBackgroundColor,),
+                                hintText: 'Email',
+                                hintStyle: TextStyle(
+                                  color: Theme.of(context).scaffoldBackgroundColor,
+                                  fontSize: 18,
                                   fontFamily: 'Poppins',
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -220,14 +231,14 @@ class LoadingScreenState extends State<LoadingScreen> {
                                   borderRadius: BorderRadius.all(Radius.circular(10)),
                                   borderSide: BorderSide(
                                     width: 1,
-                                    color: Color.fromARGB(255, 255, 255, 255),
+                                    color: Theme.of(context).scaffoldBackgroundColor,
                                   ),
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.all(Radius.circular(10)),
                                   borderSide: BorderSide(
                                     width: 1,
-                                    color: Color.fromARGB(255, 255, 255, 255),
+                                    color: Theme.of(context).scaffoldBackgroundColor,
                                   ),
                                 ),
                               ),
@@ -236,19 +247,19 @@ class LoadingScreenState extends State<LoadingScreen> {
                             if (_isSignUp)
                               TextField(
                                 controller: _userController,
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  color: Color.fromARGB(255, 255, 255, 255),
-                                  fontSize: 15,
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                  color: Theme.of(context).scaffoldBackgroundColor,
+                                  fontSize: 18,
                                   fontFamily: 'Poppins',
                                   fontWeight: FontWeight.w500,
                                 ),
-                                decoration: const InputDecoration(
-                                  prefixIcon: Icon(Icons.person_2_outlined, color: Colors.white),
-                                  labelText: 'User Name',
-                                  labelStyle: TextStyle(
-                                    color: Color.fromARGB(255, 255, 255, 255),
-                                    fontSize: 15,
+                                decoration: InputDecoration(
+                                  prefixIcon: Icon(Icons.person_2_outlined, color: Theme.of(context).scaffoldBackgroundColor,),
+                                  hintText: 'User Name',
+                                  hintStyle: TextStyle(
+                                    color: Theme.of(context).scaffoldBackgroundColor,
+                                    fontSize: 18,
                                     fontFamily: 'Poppins',
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -256,14 +267,14 @@ class LoadingScreenState extends State<LoadingScreen> {
                                     borderRadius: BorderRadius.all(Radius.circular(10)),
                                     borderSide: BorderSide(
                                       width: 1,
-                                      color: Color.fromARGB(255, 255, 255, 255),
+                                      color: Theme.of(context).scaffoldBackgroundColor,
                                     ),
                                   ),
                                   focusedBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.all(Radius.circular(10)),
                                     borderSide: BorderSide(
                                       width: 1,
-                                      color: Color.fromARGB(255, 255, 255, 255),
+                                      color: Theme.of(context).scaffoldBackgroundColor,
                                     ),
                                   ),
                                 ),
@@ -271,35 +282,35 @@ class LoadingScreenState extends State<LoadingScreen> {
                             const SizedBox(height: 10),
                             TextField(
                               controller: _passController,
-                              textAlign: TextAlign.center,
+                              textAlign: TextAlign.left,
                               obscureText: !_isPasswordVisible,
-                              style: const TextStyle(
-                                color: Color.fromARGB(255, 255, 255, 255),
-                                fontSize: 15,
+                              style: TextStyle(
+                                color: Theme.of(context).scaffoldBackgroundColor,
+                                fontSize: 18,
                                 fontFamily: 'Poppins',
                                 fontWeight: FontWeight.w500,
                               ),
                               decoration: InputDecoration(
-                                prefixIcon: const Icon(Icons.lock_outline, color: Colors.white),
-                                labelText: 'Password',
-                                labelStyle: const TextStyle(
-                                  color: Color.fromARGB(255, 255, 255, 255),
-                                  fontSize: 15,
+                                prefixIcon: Icon(Icons.lock_outline, color: Theme.of(context).scaffoldBackgroundColor,),
+                                hintText: 'Password',
+                                hintStyle: TextStyle(
+                                  color: Theme.of(context).scaffoldBackgroundColor,
+                                  fontSize: 18,
                                   fontFamily: 'Poppins',
                                   fontWeight: FontWeight.w600,
                                 ),
-                                enabledBorder: const OutlineInputBorder(
+                                enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.all(Radius.circular(10)),
                                   borderSide: BorderSide(
                                     width: 1,
-                                    color: Color.fromARGB(255, 255, 255, 255),
+                                    color: Theme.of(context).scaffoldBackgroundColor,
                                   ),
                                 ),
-                                focusedBorder: const OutlineInputBorder(
+                                focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.all(Radius.circular(10)),
                                   borderSide: BorderSide(
                                     width: 1,
-                                    color: Color.fromARGB(255, 255, 255, 255),
+                                    color: Theme.of(context).scaffoldBackgroundColor,
                                   ),
                                 ),
                                 suffixIcon: IconButton(
@@ -307,7 +318,7 @@ class LoadingScreenState extends State<LoadingScreen> {
                                     _isPasswordVisible
                                         ? Icons.visibility
                                         : Icons.visibility_off,
-                                    color: Colors.white,
+                                    color: Theme.of(context).scaffoldBackgroundColor,
                                   ),
                                   onPressed: () {
                                     setState(() {
@@ -334,12 +345,12 @@ class LoadingScreenState extends State<LoadingScreen> {
                                       // For now, just print the email and password
                                     },
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color.fromARGB(255, 225, 225, 230),
+                                      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                                     ),
                                     child: Text(
                                       _isSignUp ? 'Continue' : 'Continue',
-                                      style: const TextStyle(
-                                        color: Color.fromARGB(255, 10, 10, 10),
+                                      style: TextStyle(
+                                        color: Theme.of(context).shadowColor,
                                         fontSize: 24,
                                         fontFamily: 'Poppins',
                                         fontWeight: FontWeight.w500,
@@ -356,8 +367,8 @@ class LoadingScreenState extends State<LoadingScreen> {
                                   _isSignUp
                                       ? 'Already have an account?'
                                       : 'Don’t have an account?',
-                                  style: const TextStyle(
-                                    color: Color.fromARGB(255, 0, 0, 0),
+                                  style: TextStyle(
+                                    color: Theme.of(context).shadowColor,
                                     fontSize: 15,
                                     fontFamily: 'Poppins',
                                     fontWeight: FontWeight.w800,
@@ -375,8 +386,8 @@ class LoadingScreenState extends State<LoadingScreen> {
                                   },
                                   child: Text(
                                     _isSignUp ? 'Sign In' : 'Sign Up',
-                                    style: const TextStyle(
-                                      color: Color.fromARGB(255, 255, 255, 255),
+                                    style:TextStyle(
+                                      color: Theme.of(context).scaffoldBackgroundColor,
                                       fontSize: 15,
                                       fontFamily: 'Poppins',
                                       fontWeight: FontWeight.w500,
@@ -387,10 +398,10 @@ class LoadingScreenState extends State<LoadingScreen> {
                             ),
                             const SizedBox(height: 5),
                             if (!_isSignUp)
-                              const Text(
+                              Text(
                                 'Forget Password?',
                                 style: TextStyle(
-                                  color: Color.fromARGB(255, 255, 255, 255),
+                                  color: Theme.of(context).scaffoldBackgroundColor,
                                   fontSize: 15,
                                   fontFamily: 'Poppins',
                                   fontWeight: FontWeight.w500,

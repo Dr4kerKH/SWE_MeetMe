@@ -19,19 +19,18 @@ class _StudentPage1State extends State<StudentPage1> {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  const Color.fromARGB(255, 255, 2, 2),
-                  const Color.fromARGB(255, 255, 255, 255),
+                  Theme.of(context).primaryColor,
+                  Theme.of(context).scaffoldBackgroundColor,
                 ]
               ),
             ),
-          ),
-          Center(
-            child: const Text("Hello", 
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 32,
-                fontFamily: 'Poppins',
-                fontWeight: FontWeight.w600,
+            child: const Center(
+              child: Text(
+                'Student Page 1',
+                style: TextStyle(
+                  fontSize: 24,
+                  color: Colors.white,
+                ),
               ),
             ),
           ),

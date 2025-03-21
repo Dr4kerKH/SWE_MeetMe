@@ -19,7 +19,7 @@ class _StudentPage3State extends State<StudentPage3> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        color: const Color.fromARGB(255, 255, 255, 255),
+        color: Theme.of(context).scaffoldBackgroundColor,
         child: Column(
           children: [
             const SizedBox(height: 10.0),
@@ -32,8 +32,8 @@ class _StudentPage3State extends State<StudentPage3> {
                 height: 120,
                 width: 60,
                 initialSelectedDate:  _selectedDate,
-                selectionColor: const Color.fromARGB(255, 250, 101, 101),
-                selectedTextColor: const Color.fromARGB(255, 255, 255, 255),
+                selectionColor: Theme.of(context).primaryColor,
+                selectedTextColor: Theme.of(context).scaffoldBackgroundColor,
                 locale: 'en_US',
                 daysCount: 14,
                 onDateChange: (date) {
@@ -54,17 +54,17 @@ class _StudentPage3State extends State<StudentPage3> {
                       height: 540,
                       child: SfCalendar(
                         controller: _calendarController,
-                        viewHeaderStyle: const ViewHeaderStyle(
-                          backgroundColor: Color.fromARGB(255, 255, 255, 255),
+                        viewHeaderStyle: ViewHeaderStyle(
+                          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                           dateTextStyle: TextStyle(
                             fontSize: 16,
                             fontFamily: 'Poppins',
                             fontWeight: FontWeight.w600,
-                            color: Color.fromARGB(255, 50, 50, 50),
+                            color: Theme.of(context).shadowColor,
                           ),
                         ),
                         headerHeight: 0,
-                        todayHighlightColor: Color.fromARGB(255, 250, 101, 101),
+                        todayHighlightColor: Theme.of(context).secondaryHeaderColor,
                         view: CalendarView.day,
                         initialDisplayDate: _selectedDate,
                         initialSelectedDate: _selectedDate,
@@ -81,14 +81,14 @@ class _StudentPage3State extends State<StudentPage3> {
                         final Appointment appointment = details.appointments.first;
                           return Container(
                             decoration: BoxDecoration(
-                              color: appointment.color,
+                              color: Theme.of(context).hintColor,
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Center(
                               child: Text(
                                 appointment.subject,
-                                style: const TextStyle(
-                                  color: Colors.white,
+                                style: TextStyle(
+                                  color: Theme.of(context).shadowColor,
                                   fontSize: 16,
                                   fontFamily: 'Poppins',
                                   fontWeight: FontWeight.w600,
@@ -103,12 +103,12 @@ class _StudentPage3State extends State<StudentPage3> {
                           timeInterval: Duration(minutes: 60),
                           timeFormat: 'h:mm a',
                           timeIntervalHeight: 80,
-                          allDayPanelColor: Color.fromARGB(40, 250, 101, 101),
+                          allDayPanelColor: Theme.of(context).scaffoldBackgroundColor,
                           timeTextStyle: TextStyle(
                             fontSize: 10,
                             fontFamily: 'Poppins',
                             fontWeight: FontWeight.w600,
-                            color: Color.fromARGB(255, 50, 50, 50),
+                            color: Theme.of(context).shadowColor,
                           ),
                         ),
                       ),
