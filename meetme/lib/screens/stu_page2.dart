@@ -180,6 +180,7 @@ class _StudentPage2State extends State<StudentPage2> {
                 },
               ),
             ),
+            const SizedBox(height: 28),
           ],
         ),
       ),

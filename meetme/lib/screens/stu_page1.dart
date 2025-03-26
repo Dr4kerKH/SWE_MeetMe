@@ -120,7 +120,7 @@ class _StudentPage1State extends State<StudentPage1> {
             child: Column(
               children: [
                 Container(
-                  padding: EdgeInsets.all(15),
+                  padding: EdgeInsets.all(8),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -132,10 +132,36 @@ class _StudentPage1State extends State<StudentPage1> {
                         ),
                       ),
                       IconButton(
-                        icon: Icon(Icons.add, color: Theme.of(context).shadowColor, size: 25,),
+                        icon: Icon(Icons.add_rounded, color: Theme.of(context).shadowColor, size: 25,),
                         onPressed: () => _classAdder(context),
                       ),
                     ],
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.all(15),
+                  child: TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Search Classes',
+                    hintStyle: TextStyle(
+                    fontSize: 16,
+                    color: Theme.of(context).hintColor,
+                    fontFamily: 'Poppins',
+                    ),
+                    prefixIcon: Icon(
+                    Icons.search,
+                    color: Theme.of(context).shadowColor,
+                    ),
+                    border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                    ),
+                    filled: true,
+                    fillColor: Theme.of(context).scaffoldBackgroundColor,
+                  ),
+                  onChanged: (value) {
+                    // Add search logic here
+                  },
                   ),
                 ),
                 Expanded(
