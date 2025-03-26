@@ -112,7 +112,7 @@ class _StudentPage1State extends State<StudentPage1> {
                 end: Alignment.bottomCenter,
                 colors: [
                   //Theme.of(context).primaryColor,
-                  Theme.of(context).secondaryHeaderColor,
+                  Theme.of(context).scaffoldBackgroundColor,
                   Theme.of(context).scaffoldBackgroundColor,
                 ]
               ),
@@ -120,7 +120,7 @@ class _StudentPage1State extends State<StudentPage1> {
             child: Column(
               children: [
                 Container(
-                  padding: EdgeInsets.all(20),
+                  padding: EdgeInsets.all(15),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -128,11 +128,11 @@ class _StudentPage1State extends State<StudentPage1> {
                       style: TextStyle(
                         fontSize: 24, 
                         fontWeight: FontWeight.bold,
-                        color: Theme.of(context).scaffoldBackgroundColor,
+                        color: Theme.of(context).shadowColor,
                         ),
                       ),
                       IconButton(
-                        icon: Icon(Icons.add, color: Theme.of(context).scaffoldBackgroundColor, size: 25,),
+                        icon: Icon(Icons.add, color: Theme.of(context).shadowColor, size: 25,),
                         onPressed: () => _classAdder(context),
                       ),
                     ],
@@ -145,6 +145,11 @@ class _StudentPage1State extends State<StudentPage1> {
                     itemBuilder: (context, index) {
                       return Card(
                         child: ListTile(
+                          leading: CircleAvatar(
+                            backgroundColor: Theme.of(context).shadowColor,
+                            radius: 24,
+                            backgroundImage: AssetImage('assets/logo-transparent-png.png'),
+                          ),
                           title: Text(
                             'CS-133${index + 1}-Computer Science ${index + 1}',
                             style: TextStyle(
@@ -182,6 +187,7 @@ class _StudentPage1State extends State<StudentPage1> {
                     },
                   ),
                 ),
+                const SizedBox(height: 28),
               ],
             ),
           ),
