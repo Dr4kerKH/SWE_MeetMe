@@ -55,19 +55,26 @@ class ApiService {
       throw Exception('Please enter your password');
     }
 
-    final response = await http.post(
-      Uri.parse('$baseUrl/login'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        "email": email,
-        "password": password,
-      }),
-    );
-    print(response.body);
-    if (response.statusCode != 200) {
-      throw Exception('Failed to log in: ${response.body}');
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/login'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          "email": email,
+          "password": password,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        return responseData['role']; // Return the role if login is successful
+      } else {
+        final errorData = jsonDecode(response.body);
+        throw Exception(errorData['detail']); // Throw the error message from the backend
+      }
+    } catch (e) {
+      throw Exception('Login failed: $e'); // Catch and rethrow any errors
     }
-    
   }
 
 

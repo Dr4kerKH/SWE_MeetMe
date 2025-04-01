@@ -1,21 +1,21 @@
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:flutter/material.dart';
-import 'screens/stu_page1.dart';
-import 'screens/stu_page2.dart';
-import 'screens/stu_page3.dart';
-import 'screens/stu_page4.dart';
+import 'screens/prof_page1.dart';
+import 'screens/prof_page2.dart';
+import 'screens/prof_page3.dart';
+import 'screens/prof_page4.dart';
 import 'main.dart';
 //import 'screens/stu_page5.dart';
 
-class StudentHomePage extends StatefulWidget {
-  const StudentHomePage({super.key});
+class ProfessorHomePage extends StatefulWidget {
+  const ProfessorHomePage({super.key});
 
   @override
-  State<StudentHomePage> createState() => _HomePageState();
+  State<ProfessorHomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<StudentHomePage> {
+class _HomePageState extends State<ProfessorHomePage> {
   final PageController _controller = PageController();
   int _bottomNavIndex = 0;
 
@@ -64,11 +64,11 @@ class _HomePageState extends State<StudentHomePage> {
               });
             },
             children: [
-              StudentPage1(),
-              StudentPage2(),
-              StudentPage3(),
-              StudentPage4(),
-              //StudentPage5(),
+              ProfessorPage1(),
+              ProfessorPage2(),
+              ProfessorPage3(),
+              ProfessorPage4(),
+              //ProfessorPage5(),
             ],
           ),
           Container(

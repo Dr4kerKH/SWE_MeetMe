@@ -121,10 +121,11 @@ async def login(login_data: UserLogin):
     # Check if the user exists and the password is valid
     if not user or not verify_password(login_data.password, user['password']):
         raise HTTPException(status_code=401, detail="Invalid email or password")
+        
     # Generate a JWT token for the authenticated user
     token = create_access_token(data={"sub": user['email']})
     # Return the token
-    return {"access_token": token, "token_type": "bearer"}
+    return {"role": user["role"],"access_token": token, "token_type": "bearer"}
 
 @app.post("/appointments", response_model=AppointmentResponse)
 async def create_appointment(appointment: Appointment):

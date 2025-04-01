@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'student_pages.dart';
 import 'api_service.dart';
+import 'professor_pages.dart';
 
 void main() {
   runApp(const MeetMeApp());
@@ -361,12 +362,18 @@ class LoadingScreenState extends State<LoadingScreen> {
                                           });
 
                                         } else {
-                                          await ApiService.login(email, password);
-
-                                          Navigator.pushReplacement(
-                                            context,
-                                            MaterialPageRoute(builder: (context) => const HomePage()),
-                                          );
+                                          final returnRole = await ApiService.login(email, password) as String?;
+                                          if (returnRole != null && returnRole == 'Professor') {
+                                            Navigator.pushReplacement(
+                                              context,
+                                              MaterialPageRoute(builder: (context) => const ProfessorHomePage()),
+                                            );
+                                          } else if (returnRole == 'Student') {
+                                            Navigator.pushReplacement(
+                                              context,
+                                              MaterialPageRoute(builder: (context) => const StudentHomePage()),
+                                            );
+                                          }
                                         }
                                       } catch (e) {
                                         ScaffoldMessenger.of(context).showSnackBar(
