@@ -115,12 +115,16 @@ async def login(login_data: UserLogin):
     - Verifies the password.
     - Generates a JWT token on successful authentication.
     """
-    user = next((u for u in users_collection if u["email"] == login_data.email), None)
+    # Query the database for a user with the provided email
+    user = users_collection.find_one({"email": login_data.email})
+    
+    # Check if the user exists and the password is valid
     if not user or not verify_password(login_data.password, user['password']):
         raise HTTPException(status_code=401, detail="Invalid email or password")
-    
-    token = create_access_token(data={"sub": user['email']})  # Create JWT token
-    return {"access_token": token, "token_type": "bearer"}  # Return token  # Return token
+    # Generate a JWT token for the authenticated user
+    token = create_access_token(data={"sub": user['email']})
+    # Return the token
+    return {"access_token": token, "token_type": "bearer"}
 
 @app.post("/appointments", response_model=AppointmentResponse)
 async def create_appointment(appointment: Appointment):

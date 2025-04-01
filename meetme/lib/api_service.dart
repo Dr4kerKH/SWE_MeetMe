@@ -57,16 +57,17 @@ class ApiService {
 
     final response = await http.post(
       Uri.parse('$baseUrl/login'),
-      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-      body: {
-        "username": email,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        "email": email,
         "password": password,
-      },
+      }),
     );
-
+    print(response.body);
     if (response.statusCode != 200) {
       throw Exception('Failed to log in: ${response.body}');
     }
+    
   }
 
 
