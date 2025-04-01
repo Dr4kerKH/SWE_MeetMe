@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'student_pages.dart';
+import 'api_service.dart';
 
 void main() {
   runApp(const MeetMeApp());
@@ -336,13 +337,42 @@ class LoadingScreenState extends State<LoadingScreen> {
                                   width: 330,
                                   height: 55,
                                   child: ElevatedButton(
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(builder: (context) => const HomePage()),
-                                      );
-                                      // Handle sign-in or sign-up logic here},
-                                      // For now, just print the email and password
+                                    onPressed: () async {
+
+                                      final email = _emailController.text.trim();
+                                      final password = _passController.text.trim();
+                                      final username = _userController.text.trim();
+                                      final role = _isProfessor ? 'Professor' : (_isStudent ? 'Student' : null);
+
+                                      try {
+                                        if (_isSignUp) {
+                                          await ApiService.createAccount(email, username, password, role!);
+
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            const SnackBar(content: Text('Account created. Please sign in.')),
+                                          );
+
+                                          // Switch back to Sign-In mode and reset professor/student state
+                                          setState(() {
+                                            _isSignUp = false;
+                                            _isProfessor = false;
+                                            _isStudent = false;
+                                            _userController.clear();
+                                          });
+
+                                        } else {
+                                          await ApiService.login(email, password);
+
+                                          Navigator.pushReplacement(
+                                            context,
+                                            MaterialPageRoute(builder: (context) => const HomePage()),
+                                          );
+                                        }
+                                      } catch (e) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(content: Text('Error: $e')),
+                                        );
+                                      }
                                     },
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Theme.of(context).scaffoldBackgroundColor,

@@ -9,6 +9,11 @@ class User(BaseModel):
     password: str
     role: str  # "professor" or "student"
 
+class UserLogin(BaseModel):
+    """Model representing a user when login."""
+    email: EmailStr
+    password: str
+
 class UserResponse(BaseModel):
     """Model for user response without password."""
     email: EmailStr

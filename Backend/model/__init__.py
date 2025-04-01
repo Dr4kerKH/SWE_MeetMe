@@ -1,1 +1,1 @@
-from .models import User, UserResponse, Appointment, AppointmentResponse, Class, ClassResponse
+from .models import User, UserResponse, Appointment, AppointmentResponse, Class, ClassResponse, UserLogin

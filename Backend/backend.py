@@ -10,7 +10,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm  # 
 from passlib.context import CryptContext  # Password hashing for security
 import jwt  # JSON Web Token for authentication
 from bson import ObjectId  # To work with MongoDB Object IDs
-from model import User, UserResponse, Appointment, AppointmentResponse, Class, ClassResponse  # Import Pydantic models
+from model import User, UserResponse, Appointment, AppointmentResponse, Class, ClassResponse, UserLogin  # Import Pydantic models
 from pymongo.server_api import ServerApi
 
 # Load environment variables (e.g., database connection URI, secret key)
@@ -66,8 +66,7 @@ def get_password_hash(password):
 def create_access_token(data: dict, expires_delta: timedelta = timedelta(hours=1)):
     """Generate a JWT access token with the provided user data."""
     to_encode = data.copy()
-    expire = datetime.utcnow() + expires_delta
-    to_encode.update({"exp": expire})  # Add expiration time to token
+    to_encode.update({"exp": datetime.utcnow() + expires_delta})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 def get_current_user(token: str = Depends(oauth2_scheme)):
@@ -109,19 +108,19 @@ async def create_account(user: User):
     return UserResponse(email=user.email, username=user.username, role=user.role)  # Return user info without password
 
 @app.post("/login")
-async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+async def login(login_data: UserLogin):
     """
     Authenticate user and return a JWT access token.
     - Checks if the email exists in the database.
     - Verifies the password.
     - Generates a JWT token on successful authentication.
     """
-    user = users_collection.find_one({"email": form_data.username})
-    if not user or not verify_password(form_data.password, user['password']):
-        raise HTTPException(status_code=401, detail="Invalid password")
+    user = next((u for u in users_collection if u["email"] == login_data.email), None)
+    if not user or not verify_password(login_data.password, user['password']):
+        raise HTTPException(status_code=401, detail="Invalid email or password")
     
     token = create_access_token(data={"sub": user['email']})  # Create JWT token
-    return {"access_token": token, "token_type": "bearer"}  # Return token
+    return {"access_token": token, "token_type": "bearer"}  # Return token  # Return token
 
 @app.post("/appointments", response_model=AppointmentResponse)
 async def create_appointment(appointment: Appointment):
