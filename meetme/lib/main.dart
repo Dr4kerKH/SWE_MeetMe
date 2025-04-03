@@ -350,7 +350,22 @@ class LoadingScreenState extends State<LoadingScreen> {
                                           await ApiService.createAccount(email, username, password, role!);
 
                                           ScaffoldMessenger.of(context).showSnackBar(
-                                            const SnackBar(content: Text('Account created. Please sign in.')),
+                                            SnackBar(
+                                              content: Text(
+                                              'Account created. Please sign in.',
+                                                style: TextStyle(
+                                                  fontFamily: 'Poppins',
+                                                  fontSize: 16,
+                                                  color: Theme.of(context).shadowColor,
+                                                ),
+                                              ),
+                                              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                                              duration: Duration(seconds: 2),
+                                              behavior: SnackBarBehavior.floating,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(12),
+                                              ),
+                                            ),
                                           );
 
                                           // Switch back to Sign-In mode and reset professor/student state
@@ -377,7 +392,22 @@ class LoadingScreenState extends State<LoadingScreen> {
                                         }
                                       } catch (e) {
                                         ScaffoldMessenger.of(context).showSnackBar(
-                                          SnackBar(content: Text('Error: $e')),
+                                          SnackBar(
+                                              content: Text(
+                                              'Error: $e',
+                                                style: TextStyle(
+                                                  fontFamily: 'Poppins',
+                                                  fontSize: 16,
+                                                  color: Theme.of(context).shadowColor,
+                                                ),
+                                              ),
+                                              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                                              duration: Duration(seconds: 2),
+                                              behavior: SnackBarBehavior.floating,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(12),
+                                              ),
+                                            ),
                                         );
                                       }
                                     },

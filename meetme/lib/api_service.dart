@@ -15,7 +15,6 @@ class ApiService {
     if (!emailRegex.hasMatch(email)) {
       throw Exception('Invalid email format');
     }
-    
     if (username.isEmpty) {
       throw Exception('Please enter a username');
     }
@@ -35,14 +34,16 @@ class ApiService {
     );
 
     if (response.statusCode == 200 || response.statusCode == 201) {
-      print("Account created successfully");
+        // Account created successfully
+        return;
     } else {
-      print("Error: ${response.statusCode} - ${response.body}");
+      // Extract the error message from the response body
+      final errorData = jsonDecode(response.body);
+      throw Exception(errorData['detail'] ?? 'Failed to create account');
     }
   }
 
   static Future<void> login(String email, String password) async {
-    
     // Email format validation using RegEx
     final emailRegex = RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$");
     if (email.isEmpty) {
@@ -55,28 +56,23 @@ class ApiService {
       throw Exception('Please enter your password');
     }
 
-    try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/login'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          "email": email,
-          "password": password,
-        }),
-      );
+    final response = await http.post(
+      Uri.parse('$baseUrl/login'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        "email": email,
+        "password": password,
+      }),
+    );
 
-      if (response.statusCode == 200) {
-        final responseData = jsonDecode(response.body);
-        return responseData['role']; // Return the role if login is successful
-      } else {
-        final errorData = jsonDecode(response.body);
-        throw Exception(errorData['detail']); // Throw the error message from the backend
-      }
-    } catch (e) {
-      throw Exception('Login failed: $e'); // Catch and rethrow any errors
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
+      return responseData['role']; // Return the role if login is successful
+    } else {
+      final errorData = jsonDecode(response.body);
+      throw Exception(errorData['detail']); // Throw the error message from the backend
     }
   }
-
 
   static Future<List<Map<String, dynamic>>> getClasses() async {
     final response = await http.get(

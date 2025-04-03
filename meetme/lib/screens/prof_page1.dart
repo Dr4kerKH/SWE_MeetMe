@@ -12,6 +12,9 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
   Future<void> _classAdder(BuildContext context) {
     
     final TextEditingController codeController = TextEditingController();
+    final TextEditingController classController = TextEditingController();
+    final TextEditingController professorController = TextEditingController();
+    final TextEditingController descriptionController = TextEditingController();
 
     return showDialog<void>(
       context: context,
@@ -22,7 +25,7 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
           ),
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           title: Text(
-            'Class Registration',
+            'Class Creation',
             style: TextStyle(
               fontFamily: 'Poppins',
               fontSize: 20,
@@ -32,31 +35,134 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Text(
-                'Please enter the code provided by your teacher',
+                'Please fill in the class informations',
                 style: TextStyle(
                   fontFamily: 'Poppins',
                   fontSize: 16,
                   color: Theme.of(context).shadowColor,
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
+              Text(
+                'Class Name',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 16,
+                  color: Theme.of(context).shadowColor,
+                ),
+                textAlign: TextAlign.left,
+              ),
               TextField(
-                controller: codeController,
+                controller: classController,
                 decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(14),
+                  border: UnderlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Theme.of(context).hintColor,
+                      width: 1.0,
+                    ),
                   ),
-                  hintText: 'Class Code Ex: ABCD1234',
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Theme.of(context).hintColor,
+                      width: 1.0,
+                    ),
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Theme.of(context).shadowColor,
+                      width: 1.0,
+                    ),
+                  ),
+                  hintText: '(Ex: CS-4399-Senior Project Design)',
+                  hintStyle: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 12,
+                    color: Theme.of(context).hintColor,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'Professor Name',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 16,
+                  color: Theme.of(context).shadowColor,
+                ),
+                textAlign: TextAlign.left,
+              ),
+              TextField(
+                controller: professorController,
+                decoration: InputDecoration(
+                  border: UnderlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Theme.of(context).hintColor,
+                      width: 1.0,
+                    ),
+                  ),
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Theme.of(context).hintColor,
+                      width: 1.0,
+                    ),
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Theme.of(context).shadowColor,
+                      width: 1.0,
+                    ),
+                  ),
+                  hintText: '(Ex: Dr.Rafael)',
+                  hintStyle: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 12,
+                    color: Theme.of(context).hintColor,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'Class Description',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 16,
+                  color: Theme.of(context).shadowColor,
+                ),
+                textAlign: TextAlign.left,
+              ),
+              TextField(
+                controller: descriptionController,
+                decoration: InputDecoration(
+                  border: UnderlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Theme.of(context).hintColor,
+                      width: 1.0,
+                    ),
+                  ),
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Theme.of(context).hintColor,
+                      width: 1.0,
+                    ),
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Theme.of(context).shadowColor,
+                      width: 1.0,
+                    ),
+                  ),
+                  hintText: '',
                   hintStyle: TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 16,
                     color: Theme.of(context).hintColor,
                     fontStyle: FontStyle.italic,
                   ),
-                  filled: true,
-                  fillColor: Theme.of(context).scaffoldBackgroundColor,
                 ),
               ),
             ],
@@ -90,8 +196,29 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
                   // Handle class registration logic here
                   // Where it should search the class in DB and add it to classes' list
                   // print('Class registered with code: $classCode');
+                  Navigator.of(context).pop();
                 }
-                Navigator.of(context).pop();
+                else {
+                  // Show error message if the code is empty
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Please enter a class code',
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 16,
+                          color: Theme.of(context).shadowColor,
+                        ),
+                      ),
+                      backgroundColor: Theme.of(context).hintColor,
+                      duration: Duration(seconds: 2),
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  );
+                }
               },
             ),
           ],
