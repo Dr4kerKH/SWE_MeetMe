@@ -25,7 +25,6 @@ class Appointment(BaseModel):
     student_name: str
     student_email: EmailStr
     course_id: str
-    course_name: str
     professor_name: str
     appointment_date: datetime
 
@@ -36,8 +35,8 @@ class AppointmentResponse(Appointment):
 class Class(BaseModel):
     """Model representing a class."""
     course_id: str
-    course_name: str
     professor_name: str
+    course_description: str
 
 class ClassResponse(Class):
     """Model for class response with an ID."""

@@ -31,12 +31,12 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
                   color: Theme.of(context).shadowColor,
                 ),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 2),
               Text(
                 'By $professorName',
                 style: TextStyle(
                   fontFamily: 'Poppins',
-                  fontSize: 16,
+                  fontSize: 14,
                   fontWeight: FontWeight.bold,
                   fontStyle: FontStyle.italic,
                   color: Theme.of(context).shadowColor,
@@ -47,13 +47,13 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
                 description,
                 style: TextStyle(
                   fontFamily: 'Poppins',
-                  fontSize: 16,
+                  fontSize: 14,
                   color: Theme.of(context).hintColor,
                 ),
               ),
               const SizedBox(height: 10),
               Text(
-                'Join Code:    $joinCode',
+                'Join Code: $joinCode',
                 style: TextStyle(
                   fontFamily: 'Poppins',
                   fontSize: 20,
@@ -63,21 +63,6 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
               ),
             ],
           ),
-          /*actions: <Widget>[
-            TextButton(
-              child: Text(
-                'Close',
-                style: TextStyle(
-                  color: Theme.of(context).secondaryHeaderColor,
-                  fontFamily: 'Poppins',
-                  fontSize: 16,
-                ),
-              ),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],*/
         );
       },
     );
@@ -381,9 +366,9 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
                       return Card(
                         child: ListTile(
                           leading: CircleAvatar(
-                            backgroundColor: Theme.of(context).shadowColor,
-                            radius: 24,
-                            backgroundImage: AssetImage('assets/logo-transparent-png.png'),
+                            backgroundColor: Theme.of(context).secondaryHeaderColor,
+                            radius: 32,
+                            //backgroundImage: AssetImage('assets/logo-transparent-png.png'),
                           ),
                           title: Text(
                             'CS-133${index + 1}-Computer Science ${index + 1}',

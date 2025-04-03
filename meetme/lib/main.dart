@@ -365,6 +365,11 @@ class LoadingScreenState extends State<LoadingScreen> {
                                               shape: RoundedRectangleBorder(
                                                 borderRadius: BorderRadius.circular(12),
                                               ),
+                                              margin: EdgeInsets.only(
+                                                top: MediaQuery.of(context).padding.top + 10, // Position it below the status bar
+                                                left: 16,
+                                                right: 16,
+                                              ),
                                             ),
                                           );
 
@@ -406,6 +411,11 @@ class LoadingScreenState extends State<LoadingScreen> {
                                               behavior: SnackBarBehavior.floating,
                                               shape: RoundedRectangleBorder(
                                                 borderRadius: BorderRadius.circular(12),
+                                              ),
+                                              margin: EdgeInsets.only(
+                                                top: MediaQuery.of(context).padding.top + 10, // Position it below the status bar
+                                                left: 16,
+                                                right: 16,
                                               ),
                                             ),
                                         );

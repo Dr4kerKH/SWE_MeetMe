@@ -9,10 +9,57 @@ class StudentPage1 extends StatefulWidget {
 
 class _StudentPage1State extends State<StudentPage1> {
   
-  Future<void> _classAdder(BuildContext context) {
-    
-    final TextEditingController codeController = TextEditingController();
+  void _showClassDetailsDialog(BuildContext context, String className, String professorName, String joinCode, String description) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                className,
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).shadowColor,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                'By $professorName',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  fontStyle: FontStyle.italic,
+                  color: Theme.of(context).shadowColor,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                description,
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 14,
+                  color: Theme.of(context).hintColor,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
+  Future<void> _classAdder(BuildContext context) {
+    final TextEditingController codeController = TextEditingController();
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
@@ -172,9 +219,9 @@ class _StudentPage1State extends State<StudentPage1> {
                       return Card(
                         child: ListTile(
                           leading: CircleAvatar(
-                            backgroundColor: Theme.of(context).shadowColor,
-                            radius: 24,
-                            backgroundImage: AssetImage('assets/logo-transparent-png.png'),
+                            backgroundColor: Theme.of(context).secondaryHeaderColor,
+                            radius: 32,
+                            //backgroundImage: AssetImage('assets/logo-transparent-png.png'),
                           ),
                           title: Text(
                             'CS-133${index + 1}-Computer Science ${index + 1}',
@@ -206,7 +253,13 @@ class _StudentPage1State extends State<StudentPage1> {
                             ],
                             ),
                           onTap: () {
-
+                            _showClassDetailsDialog(
+                              context,
+                              'CS-133${index + 1}-Computer Science ${index + 1}', // Class Name
+                              'Rob LeGrand', // Professor Name
+                              'ABCD123${index + 1}', // Join Code
+                              'This is a detailed description of the class. It will contain more information about the class.', // Description
+                            );
                           },
                         ),
                       );
