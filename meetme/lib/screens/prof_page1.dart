@@ -9,8 +9,81 @@ class ProfessorPage1 extends StatefulWidget {
 
 class _ProfessorPage1State extends State<ProfessorPage1> {
   
+  void _showClassDetailsDialog(BuildContext context, String className, String professorName, String joinCode, String description) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                className,
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).shadowColor,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'By $professorName',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  fontStyle: FontStyle.italic,
+                  color: Theme.of(context).shadowColor,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                description,
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 16,
+                  color: Theme.of(context).hintColor,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'Join Code:    $joinCode',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).shadowColor,
+                ),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text(
+                'Close',
+                style: TextStyle(
+                  color: Theme.of(context).secondaryHeaderColor,
+                  fontFamily: 'Poppins',
+                  fontSize: 16,
+                ),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> _classAdder(BuildContext context) {
-    
     final TextEditingController codeController = TextEditingController();
     final TextEditingController classController = TextEditingController();
     final TextEditingController professorController = TextEditingController();
@@ -46,14 +119,17 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
                 ),
               ),
               const SizedBox(height: 10),
-              Text(
-                'Class Name',
-                style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontSize: 16,
-                  color: Theme.of(context).shadowColor,
+              Align(
+                alignment: Alignment.centerLeft,                
+                child: Text(
+                  'Class Name',
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 16,
+                    fontStyle: FontStyle.italic,
+                    color: Theme.of(context).shadowColor,
+                  ),
                 ),
-                textAlign: TextAlign.left,
               ),
               TextField(
                 controller: classController,
@@ -86,14 +162,17 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
                 ),
               ),
               const SizedBox(height: 10),
-              Text(
-                'Professor Name',
-                style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontSize: 16,
-                  color: Theme.of(context).shadowColor,
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Professor Name',
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 16,
+                    fontStyle: FontStyle.italic,
+                    color: Theme.of(context).shadowColor,
+                  ),
                 ),
-                textAlign: TextAlign.left,
               ),
               TextField(
                 controller: professorController,
@@ -126,14 +205,17 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
                 ),
               ),
               const SizedBox(height: 10),
-              Text(
-                'Class Description',
-                style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontSize: 16,
-                  color: Theme.of(context).shadowColor,
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Class Description',
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 16,
+                    fontStyle: FontStyle.italic,
+                    color: Theme.of(context).shadowColor,               
+                  ),
                 ),
-                textAlign: TextAlign.left,
               ),
               TextField(
                 controller: descriptionController,
@@ -333,7 +415,13 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
                             ],
                             ),
                           onTap: () {
-
+                            _showClassDetailsDialog(
+                              context,
+                              'CS-133${index + 1}-Computer Science ${index + 1}', // Class Name
+                              'Rob LeGrand', // Professor Name
+                              'ABCD123${index + 1}', // Join Code
+                              'This is a detailed description of the class. It will contain more information about the class.', // Description
+                            );
                           },
                         ),
                       );
