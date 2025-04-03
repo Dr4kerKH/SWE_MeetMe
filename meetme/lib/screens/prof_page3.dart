@@ -32,7 +32,7 @@ class _ProfessorPage3State extends State<ProfessorPage3> {
                 height: 120,
                 width: 60,
                 initialSelectedDate:  _selectedDate,
-                selectionColor: Theme.of(context).primaryColor,
+                selectionColor: Theme.of(context).secondaryHeaderColor,
                 selectedTextColor: Theme.of(context).scaffoldBackgroundColor,
                 locale: 'en_US',
                 daysCount: 14,
@@ -88,7 +88,7 @@ class _ProfessorPage3State extends State<ProfessorPage3> {
                               child: Text(
                                 appointment.subject,
                                 style: TextStyle(
-                                  color: Theme.of(context).shadowColor,
+                                  color: Theme.of(context).scaffoldBackgroundColor,
                                   fontSize: 16,
                                   fontFamily: 'Poppins',
                                   fontWeight: FontWeight.w600,

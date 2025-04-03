@@ -105,26 +105,26 @@ class _HomePageState extends State<ProfessorHomePage> {
           },
           tabs: [
             GButton(
-              icon: Icons.home_filled,
-              text: 'Home',
+              icon: Icons.home_rounded,
+              //text: 'Home',
               iconActiveColor: Theme.of(context).shadowColor,
               iconColor: Theme.of(context).hintColor,
               ),
             GButton(
               icon: Icons.dashboard_customize_rounded, 
-              text: 'Appointments',
+              //text: 'Appointments',
               iconActiveColor: Theme.of(context).shadowColor,
               iconColor: Theme.of(context).hintColor,
               ),
             GButton(
-              icon: Icons.storage_rounded, 
-              text: 'Calendar',
+              icon: Icons.web, 
+              //text: 'Calendar',
               iconActiveColor: Theme.of(context).shadowColor,
               iconColor: Theme.of(context).hintColor,
             ),
             GButton(
-              icon: Icons.message_rounded, 
-              text: 'Chat',
+              icon: Icons.add_comment, 
+              //text: 'Chat',
               iconActiveColor: Theme.of(context).shadowColor,
               iconColor: Theme.of(context).hintColor,
               ),  

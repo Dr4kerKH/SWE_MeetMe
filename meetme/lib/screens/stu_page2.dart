@@ -134,7 +134,7 @@ class _StudentPage2State extends State<StudentPage2> {
                 height: 120,
                 width: 60,
                 initialSelectedDate:  DateTime.now(),
-                selectionColor: Theme.of(context).primaryColor,
+                selectionColor: Theme.of(context).secondaryHeaderColor,
                 selectedTextColor: Theme.of(context).scaffoldBackgroundColor,
                 locale: 'en_US',
                 daysCount: 14,

@@ -20,7 +20,7 @@ class _StudentPage4State extends State<StudentPage4> {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Theme.of(context).primaryColor,
+                  Theme.of(context).secondaryHeaderColor,
                   Theme.of(context).scaffoldBackgroundColor,
                 ]
               ),
@@ -76,36 +76,33 @@ class _StudentPage4State extends State<StudentPage4> {
           const SizedBox(height: 20.0),
           Column(
             children: [
-              CupertinoPageScaffoldBackgroundColor(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                child: Padding(
-                padding: const EdgeInsets.only(top: 100.0, left: 20.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: const Color.fromARGB(255, 255, 255, 255),
-                    borderRadius: BorderRadius.circular(24),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color.fromARGB(110, 0, 0, 0),
-                        blurRadius: 10,
-                        offset: Offset(0, 5),
-                      ),
-                    ],
-                  ),
-                  child: Center(
-                    child: const Text(
-                      'Meet Me',
-                      style: TextStyle(
-                        color: Color.fromARGB(255, 0, 0, 0),
-                        fontSize: 30,
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.w600,
-                      ),
+              Padding(
+              padding: const EdgeInsets.only(top: 100.0, left:5.0, right:5.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: const Color.fromARGB(255, 255, 255, 255),
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color.fromARGB(110, 0, 0, 0),
+                      blurRadius: 10,
+                      offset: Offset(0, 5),
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: const Text(
+                    'Meet Me',
+                    style: TextStyle(
+                      color: Color.fromARGB(255, 0, 0, 0),
+                      fontSize: 30,
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
-              ))
-              
+              ),
+              )
             ],
           ),
         ],

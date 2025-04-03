@@ -15,7 +15,7 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
       builder: (BuildContext context) {
         return AlertDialog(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
           ),
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           content: Column(
@@ -63,7 +63,7 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
               ),
             ],
           ),
-          actions: <Widget>[
+          /*actions: <Widget>[
             TextButton(
               child: Text(
                 'Close',
@@ -77,7 +77,7 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
                 Navigator.of(context).pop();
               },
             ),
-          ],
+          ],*/
         );
       },
     );

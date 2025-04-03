@@ -20,7 +20,7 @@ class _ProfessorPage3State extends State<ProfessorPage4> {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Theme.of(context).primaryColor,
+                  Theme.of(context).secondaryHeaderColor,
                   Theme.of(context).scaffoldBackgroundColor,
                 ]
               ),
@@ -79,7 +79,7 @@ class _ProfessorPage3State extends State<ProfessorPage4> {
               CupertinoPageScaffoldBackgroundColor(
                 color: Theme.of(context).scaffoldBackgroundColor,
                 child: Padding(
-                padding: const EdgeInsets.only(top: 100.0, left: 20.0),
+                padding: const EdgeInsets.only(top: 100.0, left: 10.0, right:10),
                 child: Container(
                   decoration: BoxDecoration(
                     color: const Color.fromARGB(255, 255, 255, 255),
