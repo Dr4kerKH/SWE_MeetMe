@@ -2,11 +2,14 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiService {
+  
   // Change base URL accordingly
   static const String baseUrl = "http://10.0.2.2:8000"; // For Android emulator
   // static const String baseUrl = "http://localhost:8000"; // For iOS simulator or web
   
+  //####################################################################################################
   static Future<void> createAccount(String email, String username, String password, String role) async {
+    
     // Email format validation using RegEx
     final emailRegex = RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$");
     if (email.isEmpty) {
@@ -43,7 +46,9 @@ class ApiService {
     }
   }
 
+//###################################################################
   static Future<void> login(String email, String password) async {
+    
     // Email format validation using RegEx
     final emailRegex = RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$");
     if (email.isEmpty) {
@@ -74,6 +79,31 @@ class ApiService {
     }
   }
 
+//##########################################################################
+static Future<void> createClass({
+  required String className,
+  required String professorName,
+  required String classDescription,
+  required String classCode,
+}) async {
+  final url = Uri.parse('$baseUrl/classes');
+  final response = await http.post(
+    url,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: jsonEncode({
+      'className': className,
+      'professorName': professorName,
+    }),
+  );
+
+  if (response.statusCode != 200 && response.statusCode != 201) {
+    throw Exception('Failed to create class: ${response.body}');
+  }
+}
+
+//##########################################################################
   static Future<List<Map<String, dynamic>>> getClasses() async {
     final response = await http.get(
       Uri.parse('$baseUrl/classes'),
@@ -86,6 +116,7 @@ class ApiService {
     }
   }
 
+//##########################################################################
   static Future<Map<String, dynamic>> getClassById(String courseId) async {
     final response = await http.get(
       Uri.parse('$baseUrl/classes/$courseId'),
@@ -98,6 +129,7 @@ class ApiService {
     }
   }
 
+//#########################################################################
   static Future<void> createAppointment({
     required String studentName,
     required String studentEmail,
@@ -127,6 +159,7 @@ class ApiService {
     }
   }
 
+//##########################################################################
   static Future<List<Map<String, dynamic>>> getAppointments() async {
     final response = await http.get(
       Uri.parse('$baseUrl/appointments'),
@@ -139,6 +172,7 @@ class ApiService {
     }
   }
 
+//##########################################################################
   static Future<void> deleteAppointment(String appointmentId) async {
     final response = await http.delete(
       Uri.parse('$baseUrl/appointments/$appointmentId'),
@@ -149,6 +183,7 @@ class ApiService {
     }
   }
 
+//##########################################################################
   static Future<void> deleteClass(String courseId) async {
     final response = await http.delete(
       Uri.parse('$baseUrl/classes/$courseId'),

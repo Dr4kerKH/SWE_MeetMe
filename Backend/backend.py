@@ -12,6 +12,8 @@ import jwt  # JSON Web Token for authentication
 from bson import ObjectId  # To work with MongoDB Object IDs
 from model import User, UserResponse, Appointment, AppointmentResponse, Class, ClassResponse, UserLogin  # Import Pydantic models
 from pymongo.server_api import ServerApi
+import random
+import string
 
 # Load environment variables (e.g., database connection URI, secret key)
 load_dotenv()
@@ -136,32 +138,41 @@ async def create_appointment(appointment: Appointment):
     """
     # Calculate the end time of the appointment
     start_time = appointment.appointment_date
-    end_time = start_time + timedelta(minutes=30)
-    
+    end_time = start_time + timedelta(minutes=29)
     # Check if the duration is exactly 30 minutes
-    if (end_time - start_time).total_seconds() != 1800:
+    if (end_time - start_time).total_seconds() != 1740:
         raise HTTPException(status_code=400, detail="Appointment duration must be exactly 30 minutes")
     
     appointment_dict = appointment.dict()
     appointment_dict["appointment_date"] = start_time.isoformat()  # Convert date to string
     result = appointments_collection.insert_one(appointment_dict)  # Insert into database
     appointment_dict["id"] = str(result.inserted_id)  # Convert ObjectId to string for API response
-
     return {"id": appointment_dict["id"], "appointment_date": start_time.isoformat()}  # Return the newly created appointment
 
 @app.post("/classes", response_model=ClassResponse)
 async def create_class(cls: Class):
     """
     Create a new class entry.
-    - Ensures the course ID is unique.
+    - Ensures the course_code is unique by generating an 8-character alphanumeric code.
+    - The client only needs to provide class_name, professor_name, and class_description.
     """
-    if classes_collection.find_one({"course_id": cls.course_id}):
-        raise HTTPException(status_code=400, detail="Course ID already exists")
+    def generate_unique_course_code():
+        """Generate a unique 8-character alphanumeric course code."""
+        while True:
+            course_code = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+            if not classes_collection.find_one({"course_code": course_code}):
+                return course_code
 
-    class_dict = cls.dict()
+    # Generate a unique course code
+    cls.course_code = generate_unique_course_code()
+    class_dict = {
+        "course_code": cls.course_code,
+        "course_name": cls.course_id,
+        "professor_name": cls.professor_name,
+        "course_description": cls.course_description,
+    }
     result = classes_collection.insert_one(class_dict)  # Insert class into the database
     class_dict["id"] = str(result.inserted_id)  # Convert ObjectId to string for response
-
     return class_dict  # Return the created class details
 
 #######################################################################
@@ -175,7 +186,6 @@ async def get_classes():
     classes = list(classes_collection.find())  # Fetch all classes
     if not classes:
         raise HTTPException(status_code=404, detail="No classes found")
-    
     return [{"id": str(cls["_id"]), **cls} for cls in classes]  # Convert ObjectId to string and return
 
 @app.get("/classes/{course_id}", response_model=ClassResponse)

@@ -34,6 +34,7 @@ class AppointmentResponse(Appointment):
 
 class Class(BaseModel):
     """Model representing a class."""
+    course_code: str
     course_id: str
     professor_name: str
     course_description: str
