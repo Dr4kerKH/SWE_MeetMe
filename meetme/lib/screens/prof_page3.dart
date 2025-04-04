@@ -47,7 +47,7 @@ class _ProfessorPage3State extends State<ProfessorPage3> {
             ),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(12.0),
                 child: Column(
                   children: [
                     SizedBox(
@@ -79,19 +79,23 @@ class _ProfessorPage3State extends State<ProfessorPage3> {
                         },
                         appointmentBuilder: (context, details) {
                         final Appointment appointment = details.appointments.first;
-                          return Container(
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).hintColor,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Center(
-                              child: Text(
-                                appointment.subject,
-                                style: TextStyle(
-                                  color: Theme.of(context).scaffoldBackgroundColor,
-                                  fontSize: 16,
-                                  fontFamily: 'Poppins',
-                                  fontWeight: FontWeight.w600,
+                          return Material(
+                            elevation: 4,
+                            borderRadius: BorderRadius.circular(12),
+                            color: const Color.fromARGB(255, 255, 255, 255),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  appointment.subject,
+                                  style: TextStyle(
+                                    color: Theme.of(context).hintColor,
+                                    fontSize: 14,
+                                    fontFamily: 'Poppins',
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ),
                             ),
@@ -133,11 +137,11 @@ List<Appointment> getAppointments(DateTime selectedDate) {
   List<Appointment> meetings = <Appointment>[];
   final DateTime today = DateTime.now();
   final DateTime startTime = DateTime(today.year, today.month, today.day, 17, 0, 0);
-  final DateTime endTime = startTime.add(const Duration(hours: 1));
+  final DateTime endTime = startTime.add(Duration(minutes: 29));
   meetings.add(Appointment(
     startTime: startTime,
     endTime: endTime,
-    subject: 'Meeting',
+    subject: 'Meeting Details',
     color: const Color.fromARGB(90, 255, 0, 13),
     recurrenceRule: 'FREQ=DAILY;INTERVAL=2;COUNT=3',
   ));

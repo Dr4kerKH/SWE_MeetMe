@@ -20,7 +20,7 @@ class _ProfessorPage3State extends State<ProfessorPage4> {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Theme.of(context).secondaryHeaderColor,
+                  Theme.of(context).scaffoldBackgroundColor,
                   Theme.of(context).scaffoldBackgroundColor,
                 ]
               ),
