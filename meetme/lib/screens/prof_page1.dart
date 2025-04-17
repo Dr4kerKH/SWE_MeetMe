@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../api_service.dart';
 
 class ProfessorPage1 extends StatefulWidget {
   const ProfessorPage1({super.key});
@@ -8,7 +9,31 @@ class ProfessorPage1 extends StatefulWidget {
 }
 
 class _ProfessorPage1State extends State<ProfessorPage1> {
-  
+  List<Map<String, dynamic>> _classList = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchClasses();
+  }
+
+  Future<void> _fetchClasses() async {
+    try {
+      final classes = await ApiService.getMyClasses();
+      setState(() {
+        _classList = classes;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() => _isLoading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to  classes: $e")),
+      );
+    }
+  }
+
+
   void _showClassDetailsDialog(BuildContext context, String className, String professorName, String joinCode, String description) {
     showDialog(
       context: context,
@@ -69,7 +94,6 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
   }
 
   Future<void> _classAdder(BuildContext context) {
-    final TextEditingController codeController = TextEditingController();
     final TextEditingController classController = TextEditingController();
     final TextEditingController professorController = TextEditingController();
     final TextEditingController descriptionController = TextEditingController();
@@ -257,32 +281,56 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
                   fontSize: 16,
                 ),
               ),
-              onPressed: () {
-                final classCode = codeController.text;
-                if (classCode.isNotEmpty) {
-                  // Handle class registration logic here
-                  // Where it should search the class in DB and add it to classes' list
-                  // print('Class registered with code: $classCode');
-                  Navigator.of(context).pop();
-                }
-                else {
-                  // Show error message if the code is empty
+              onPressed: () async {
+                final className = classController.text.trim();
+                final professorName = professorController.text.trim();
+                final description = descriptionController.text.trim();
+
+                if (className.isEmpty || professorName.isEmpty || description.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
-                        'Please enter a class code',
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 16,
-                          color: Theme.of(context).shadowColor,
-                        ),
+                        'Please fill in all fields',
+                        style: TextStyle(fontFamily: 'Poppins', fontSize: 16),
                       ),
-                      backgroundColor: Theme.of(context).hintColor,
-                      duration: Duration(seconds: 2),
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                      backgroundColor: Colors.redAccent,
+                    ),
+                  );
+                  return;
+                }
+
+                Navigator.of(context).pop(); // Close the dialog
+
+                // Show temporary loading
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (_) => Center(child: CircularProgressIndicator()),
+                );
+
+                try {
+                  await ApiService.createClass(
+                    courseName: className,
+                    professorName: professorName,
+                    courseDescription: description,
+                  );
+
+                  Navigator.of(context).pop(); // Close loading
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Class created successfully'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+
+                  // Refresh class list
+                  await _fetchClasses();
+                } catch (e) {
+                  Navigator.of(context).pop(); // Close loading
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Failed to create class: $e'),
+                      backgroundColor: Colors.red,
                     ),
                   );
                 }
@@ -305,10 +353,9 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  //Theme.of(context).primaryColor,
                   Theme.of(context).scaffoldBackgroundColor,
                   Theme.of(context).scaffoldBackgroundColor,
-                ]
+                ],
               ),
             ),
             child: Column(
@@ -359,59 +406,61 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
                   ),
                 ),
                 Expanded(
-                  child: ListView.builder(
-                    padding: EdgeInsets.all(12),
-                    itemCount: 4,
-                    itemBuilder: (context, index) {
-                      return Card(
-                        child: ListTile(
-                          leading: CircleAvatar(
-                            backgroundColor: Theme.of(context).secondaryHeaderColor,
-                            radius: 32,
-                            //backgroundImage: AssetImage('assets/logo-transparent-png.png'),
-                          ),
-                          title: Text(
-                            'CS-133${index + 1}-Computer Science ${index + 1}',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).shadowColor,
+                  child: _isLoading
+                      ? Center(child: CircularProgressIndicator())
+                      : _classList.isEmpty
+                          ? Center(child: Text('No classes available'))
+                          : ListView.builder(
+                              padding: EdgeInsets.all(12),
+                              itemCount: _classList.length,
+                              itemBuilder: (context, index) {
+                                final cls = _classList[index];
+                                return Card(
+                                  child: ListTile(
+                                    leading: CircleAvatar(
+                                      backgroundColor: Theme.of(context).secondaryHeaderColor,
+                                      radius: 32,
+                                    ),
+                                    title: Text(
+                                      cls['course_name'] ?? 'Unnamed Class',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Theme.of(context).shadowColor,
+                                      ),
+                                    ),
+                                    subtitle: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          cls['professor_name'] ?? '',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontStyle: FontStyle.italic,
+                                            color: Theme.of(context).hintColor,
+                                          ),
+                                        ),
+                                        SizedBox(height: 4),
+                                        Text(
+                                          cls['course_description'] ?? '',
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            color: Theme.of(context).hintColor,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    onTap: () => _showClassDetailsDialog(
+                                      context,
+                                      cls['course_name'] ?? '',
+                                      cls['professor_name'] ?? '',
+                                      cls['course_code'] ?? '',
+                                      cls['course_description'] ?? '',
+                                    ),
+                                  ),
+                                );
+                              },
                             ),
-                          ),
-                            subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                            Text(
-                              'Rob LeGrand',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontStyle: FontStyle.italic,
-                                color: Theme.of(context).hintColor,
-                              ),
-                            ),
-                              SizedBox(height: 4),
-                              Text(
-                              '''This is a detailed description of the class.\n It will contain the more\n and more.''',
-                              style: TextStyle(
-                                fontSize: 10,
-                                color: Theme.of(context).hintColor,
-                              ),
-                              ),
-                            ],
-                            ),
-                          onTap: () {
-                            _showClassDetailsDialog(
-                              context,
-                              'CS-133${index + 1}-Computer Science ${index + 1}', // Class Name
-                              'Rob LeGrand', // Professor Name
-                              'ABCD123${index + 1}', // Join Code
-                              'This is a detailed description of the class. It will contain more information about the class.', // Description
-                            );
-                          },
-                        ),
-                      );
-                    },
-                  ),
                 ),
                 const SizedBox(height: 28),
               ],

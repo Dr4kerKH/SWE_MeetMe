@@ -3,7 +3,8 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  static const String baseUrl = "http://10.0.2.2:8000";
+  static const String baseUrl = "http://10.0.2.2:8000"; // For Android Emulator
+  // static const String baseUrl = "http://localhost:8000"; // ForIOS Simulator
 
   static const String _tokenKey = 'access_token';
   static const String _emailKey = 'user_email';
@@ -132,17 +133,24 @@ class ApiService {
   }
 
   static Future<List<Map<String, dynamic>>> getMyClasses() async {
-    final token = await _getToken();
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('access_token');
+
+    if (token == null) {
+      throw Exception('No token found. Please log in again.');
+    }
 
     final response = await http.get(
       Uri.parse('$baseUrl/my_classes'),
-      headers: {'Authorization': 'Bearer $token'},
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
     );
 
     if (response.statusCode == 200) {
       return List<Map<String, dynamic>>.from(jsonDecode(response.body));
     } else {
-      throw Exception('Failed to fetch enrolled classes: ${response.body}');
+      throw Exception('Failed to fetch your classes: ${response.body}');
     }
   }
 
