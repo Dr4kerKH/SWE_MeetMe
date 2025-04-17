@@ -136,7 +136,7 @@ async def get_schedule(date: str):
 # --- Class Management ---
 @app.post("/classes", response_model=ClassResponse)
 async def create_class(cls: Class, current_user: dict = Depends(get_current_user)):
-    if current_user["role"] != "professor":
+    if current_user["role"] != "Professor":
         raise HTTPException(status_code=403, detail="Only professors can create classes")
 
     def generate_unique_course_code():
@@ -146,6 +146,8 @@ async def create_class(cls: Class, current_user: dict = Depends(get_current_user
                 return code
 
     cls.course_code = generate_unique_course_code()
+    if classes_collection.find_one({"course_code": cls.course_code}):
+        raise HTTPException(status_code=400, detail="Course code already exists")
     class_dict = {
         "course_code": cls.course_code,
         "course_name": cls.course_name,
@@ -161,7 +163,6 @@ async def create_class(cls: Class, current_user: dict = Depends(get_current_user
         "course_code": cls.course_code,
         "role": "professor"
     })
-
     return class_dict
 
 @app.get("/classes", response_model=List[ClassResponse])

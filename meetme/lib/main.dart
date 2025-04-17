@@ -382,16 +382,27 @@ class LoadingScreenState extends State<LoadingScreen> {
                                           });
 
                                         } else {
-                                          final returnRole = await ApiService.login(email, password) as String?;
-                                          if (returnRole != null && returnRole == 'Professor') {
-                                            Navigator.pushReplacement(
-                                              context,
-                                              MaterialPageRoute(builder: (context) => const ProfessorHomePage()),
-                                            );
-                                          } else if (returnRole == 'Student') {
-                                            Navigator.pushReplacement(
-                                              context,
-                                              MaterialPageRoute(builder: (context) => const StudentHomePage()),
+                                          try {
+                                            final role = await ApiService.login(email, password); // already returns a String
+
+                                            if (role == 'Professor') {
+                                              Navigator.pushReplacement(
+                                                context,
+                                                MaterialPageRoute(builder: (context) => const ProfessorHomePage()),
+                                              );
+                                            } else if (role == 'Student') {
+                                              Navigator.pushReplacement(
+                                                context,
+                                                MaterialPageRoute(builder: (context) => const StudentHomePage()),
+                                              );
+                                            } else {
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                const SnackBar(content: Text("Unknown user role")),
+                                              );
+                                            }
+                                          } catch (e) {
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(content: Text("Login failed: $e")),
                                             );
                                           }
                                         }

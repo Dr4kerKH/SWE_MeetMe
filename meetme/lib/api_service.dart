@@ -36,7 +36,7 @@ class ApiService {
     }
   }
 
-  static Future<void> login(String email, String password) async {
+  static Future<String> login(String email, String password) async {
     final emailRegex = RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$");
     if (email.isEmpty || !emailRegex.hasMatch(email)) {
       throw Exception('Invalid email format');
@@ -55,6 +55,8 @@ class ApiService {
       await prefs.setString(_tokenKey, data['access_token']);
       await prefs.setString(_emailKey, email);
       await prefs.setString(_roleKey, data['role']);
+
+      return data['role']; // return user role
     } else {
       final error = jsonDecode(response.body);
       throw Exception(error['detail'] ?? 'Login failed');
@@ -74,7 +76,7 @@ class ApiService {
   }
 
   //=========================== CLASSES ===========================
-  static Future<void> createClass({
+  static Future<Map<String, dynamic>> createClass({
     required String courseName,
     required String professorName,
     required String courseDescription,
@@ -94,7 +96,9 @@ class ApiService {
       }),
     );
 
-    if (response.statusCode != 200 && response.statusCode != 201) {
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return jsonDecode(response.body); // return the created class
+    } else {
       throw Exception('Failed to create class: ${response.body}');
     }
   }

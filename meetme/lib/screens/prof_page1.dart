@@ -27,9 +27,9 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
       });
     } catch (e) {
       setState(() => _isLoading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
+      /*ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Failed to  classes: $e")),
-      );
+      );*/
     }
   }
 
@@ -299,13 +299,13 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
                   return;
                 }
 
-                Navigator.of(context).pop(); // Close the dialog
+                Navigator.of(context).pop(); // Close form dialog
+                await Future.delayed(Duration(milliseconds: 100));
 
-                // Show temporary loading
                 showDialog(
                   context: context,
                   barrierDismissible: false,
-                  builder: (_) => Center(child: CircularProgressIndicator()),
+                  builder: (_) => const Center(child: CircularProgressIndicator()),
                 );
 
                 try {
@@ -315,18 +315,16 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
                     courseDescription: description,
                   );
 
-                  Navigator.of(context).pop(); // Close loading
+                  if (context.mounted) Navigator.of(context, rootNavigator: true).pop(); // ✅ Close loading dialog
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('Class created successfully'),
                       backgroundColor: Colors.green,
                     ),
                   );
-
-                  // Refresh class list
                   await _fetchClasses();
                 } catch (e) {
-                  Navigator.of(context).pop(); // Close loading
+                  if (context.mounted) Navigator.of(context, rootNavigator: true).pop(); // ✅ Close loading dialog
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('Failed to create class: $e'),
@@ -334,7 +332,7 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
                     ),
                   );
                 }
-              },
+              }
             ),
           ],
         );
