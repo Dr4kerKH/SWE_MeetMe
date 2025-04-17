@@ -40,6 +40,7 @@ dependencies:
   date_picker_timeline: ^1.2.4
   syncfusion_flutter_calendar: ^28.1.37
   http: ^0.13.5
+  shared_preferences: ^2.2.1
 
 dev_dependencies:
   flutter_test:
