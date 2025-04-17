@@ -1,6 +1,7 @@
 # models.py
 from pydantic import BaseModel, EmailStr
 from datetime import datetime
+from typing import Optional
 
 class User(BaseModel):
     """Model representing a user."""
@@ -42,3 +43,11 @@ class Class(BaseModel):
 class ClassResponse(Class):
     """Model for class response with an ID."""
     id: str
+
+class Enrollment(BaseModel):
+    user_email: EmailStr
+    course_code: str
+    role: str  # "professor" or "student"
+
+class EnrollmentResponse(Enrollment):
+    id: Optional[str]

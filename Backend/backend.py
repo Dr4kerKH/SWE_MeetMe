@@ -10,7 +10,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm  # 
 from passlib.context import CryptContext  # Password hashing for security
 import jwt  # JSON Web Token for authentication
 from bson import ObjectId  # To work with MongoDB Object IDs
-from model import User, UserResponse, Appointment, AppointmentResponse, Class, ClassResponse, UserLogin  # Import Pydantic models
+from model import User, UserResponse, Appointment, AppointmentResponse, Class, ClassResponse, UserLogin, Enrollment, EnrollmentResponse  # Import Pydantic models
 from pymongo.server_api import ServerApi
 import random
 import string
@@ -44,6 +44,7 @@ db = client['MeetMeDB']  # Use 'MeetMeDB' database
 users_collection = db['users']  # Users collection
 appointments_collection = db['appointments']  # Appointments collection
 classes_collection = db['classes']  # Classes collection
+enroll_collection = db['classes']   # Enrollments collection
 
 ############################ Security Setup ############################
 # OAuth2 authentication scheme
@@ -150,7 +151,7 @@ async def create_appointment(appointment: Appointment):
     return {"id": appointment_dict["id"], "appointment_date": start_time.isoformat()}  # Return the newly created appointment
 
 @app.post("/classes", response_model=ClassResponse)
-async def create_class(cls: Class):
+async def create_class(cls: Class, current_user: dict = Depends(get_current_user)):
     """
     Create a new class entry.
     - Ensures the course_code is unique by generating an 8-character alphanumeric code.
@@ -173,6 +174,15 @@ async def create_class(cls: Class):
     }
     result = classes_collection.insert_one(class_dict)  # Insert class into the database
     class_dict["id"] = str(result.inserted_id)  # Convert ObjectId to string for response
+
+    # Enroll the professor in the class
+    enrollment_record = {
+        "user_email": current_user["email"],
+        "course_code": cls.course_code,
+        "role": "professor"
+    }
+    enroll_collection.insert_one(enrollment_record)
+
     return class_dict  # Return the created class details
 
 #######################################################################
