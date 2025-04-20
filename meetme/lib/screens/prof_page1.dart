@@ -299,9 +299,7 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
                   return;
                 }
 
-                Navigator.of(context).pop(); // Close form dialog
-                await Future.delayed(Duration(milliseconds: 100));
-
+                Navigator.of(context).pop(); // Close the input dialog
                 showDialog(
                   context: context,
                   barrierDismissible: false,
@@ -309,28 +307,46 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
                 );
 
                 try {
-                  await ApiService.createClass(
+                  final response = await ApiService.createClass(
                     courseName: className,
                     professorName: professorName,
                     courseDescription: description,
                   );
-
-                  if (context.mounted) Navigator.of(context, rootNavigator: true).pop(); // ✅ Close loading dialog
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Class created successfully'),
-                      backgroundColor: Colors.green,
-                    ),
-                  );
+                  await Future.delayed(Duration(milliseconds: 20));
+                  if (response["statusCode"] == null) {
+                    throw Exception('Response is null');
+                  }
+                  if (response['course_name'] == className) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Class created successfully'),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                  setState(() {
+                    _isLoading = true; // Show loading indicator while fetching
+                  });
                   await _fetchClasses();
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Failed to verify class creation'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
                 } catch (e) {
-                  if (context.mounted) Navigator.of(context, rootNavigator: true).pop(); // ✅ Close loading dialog
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('Failed to create class: $e'),
                       backgroundColor: Colors.red,
                     ),
                   );
+                } finally {
+                  if (context.mounted) {
+                    Navigator.of(context, rootNavigator: true).pop(); // Ensure loading dialog is dismissed
+                  }
+                  setState(() {}); // Refresh the class list
                 }
               }
             ),

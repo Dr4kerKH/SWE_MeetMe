@@ -97,7 +97,10 @@ class ApiService {
     );
 
     if (response.statusCode == 200 || response.statusCode == 201) {
-      return jsonDecode(response.body); // return the created class
+      return {
+        'statusCode': response.statusCode,
+        'body': jsonDecode(response.body),
+      };
     } else {
       throw Exception('Failed to create class: ${response.body}');
     }

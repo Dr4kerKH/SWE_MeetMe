@@ -154,16 +154,21 @@ async def create_class(cls: Class, current_user: dict = Depends(get_current_user
         "professor_name": cls.professor_name,
         "course_description": cls.course_description,
     }
-    result = classes_collection.insert_one(class_dict)
-    class_dict["id"] = str(result.inserted_id)
+    try:
+        # Insert the class into the database
+        result = classes_collection.insert_one(class_dict)
+        class_dict["id"] = str(result.inserted_id)
 
-    # Enroll professor
-    enroll_collection.insert_one({
-        "user_email": current_user["email"],
-        "course_code": cls.course_code,
-        "role": "professor"
-    })
-    return class_dict
+        # Enroll the professor in the class
+        enroll_collection.insert_one({
+            "user_email": current_user["email"],
+            "course_code": cls.course_code,
+            "role": "professor"
+        })
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
+    # Return the created class details
+    return ClassResponse(**class_dict)
 
 @app.get("/classes", response_model=List[ClassResponse])
 async def get_classes():
