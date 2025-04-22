@@ -1,19 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:date_picker_timeline/date_picker_timeline.dart';
+import '../api_service.dart';
 
 class ProfessorPage2 extends StatefulWidget {
-  const ProfessorPage2 ({super.key});
+  const ProfessorPage2({super.key});
 
   @override
-  State<ProfessorPage2 > createState() => _ProfessorPage2State();
+  State<ProfessorPage2> createState() => _ProfessorPage2State();
 }
 
-class _ProfessorPage2State extends State<ProfessorPage2 > {
-  
+class _ProfessorPage2State extends State<ProfessorPage2> {
+  List<Map<String, dynamic>> _classList = [];
+  List<Map<String, dynamic>> _filteredClassList = [];
+  bool _isLoading = true;
 
+  @override
+  void initState() {
+    super.initState();
+    _fetchClasses();
+  }
+
+  Future<void> _fetchClasses() async {
+    try {
+      final classes = await ApiService.getMyClasses();
+      classes.sort((a, b) => (a['course_name'] ?? '')
+          .toString()
+          .toLowerCase()
+          .compareTo((b['course_name'] ?? '').toString().toLowerCase()));
+
+      setState(() {
+        _classList = classes;
+        _filteredClassList = classes;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() => _isLoading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to fetch classes: $e")),
+      );
+    }
+  }
 
   Future<void> _appointmentAdder(BuildContext context) {
-    
     final TextEditingController codeController = TextEditingController();
 
     return showDialog<void>(
@@ -37,20 +65,22 @@ class _ProfessorPage2State extends State<ProfessorPage2 > {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-              'Please select the available time slot',
-              style: TextStyle(
-                fontFamily: 'Poppins',
-                fontSize: 16,
-                color: Theme.of(context).shadowColor,
-              ),
+                'Please select the available time slot',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 16,
+                  color: Theme.of(context).shadowColor,
+                ),
               ),
               const SizedBox(height: 20),
               Wrap(
                 spacing: 8.0,
                 runSpacing: 2.0,
                 children: List.generate(15, (index) {
-                  final startTime = TimeOfDay(hour: 10 + (index ~/ 2), minute: (index % 2) * 30);
-                  final endTime = TimeOfDay(hour: startTime.hour, minute: startTime.minute + 29);
+                  final startTime = TimeOfDay(
+                      hour: 10 + (index ~/ 2), minute: (index % 2) * 30);
+                  final endTime = TimeOfDay(
+                      hour: startTime.hour, minute: startTime.minute + 29);
                   return ElevatedButton(
                     onPressed: () {
                       // Handle time slot selection logic here
@@ -59,21 +89,21 @@ class _ProfessorPage2State extends State<ProfessorPage2 > {
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Theme.of(context).hintColor,
-                      foregroundColor: Theme.of(context).scaffoldBackgroundColor,
+                      foregroundColor:
+                          Theme.of(context).scaffoldBackgroundColor,
                       shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(8),
                       ),
                     ),
                     child: Text(
                       '${startTime.format(context).replaceFirst(' AM', '').replaceFirst(' PM', '')}-${endTime.format(context).replaceFirst(' AM', 'am').replaceFirst(' PM', 'pm')}',
                       style: TextStyle(
-                      fontFamily: 'Poppins',
-                      fontSize: 12,
+                        fontFamily: 'Poppins',
+                        fontSize: 12,
                       ),
                     ),
                   );
-                }
-                ),
+                }),
               ),
             ],
           ),
@@ -115,8 +145,7 @@ class _ProfessorPage2State extends State<ProfessorPage2 > {
       },
     );
   }
-  
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -126,59 +155,67 @@ class _ProfessorPage2State extends State<ProfessorPage2 > {
           children: [
             const SizedBox(height: 10.0),
             SingleChildScrollView(
-            child: Container(
-              padding: const EdgeInsets.all(12.0),
-              child: DatePicker(
-                DateTime.now(),
-                //controller: _datePickerController,
-                height: 120,
-                width: 60,
-                initialSelectedDate:  DateTime.now(),
-                selectionColor: Theme.of(context).secondaryHeaderColor,
-                selectedTextColor: Theme.of(context).scaffoldBackgroundColor,
-                locale: 'en_US',
-                daysCount: 14,
-                onDateChange: (date) {
-                  setState(() {
-                  });
-                },
+              child: Container(
+                padding: const EdgeInsets.all(12.0),
+                child: DatePicker(
+                  DateTime.now(),
+                  height: 120,
+                  width: 60,
+                  initialSelectedDate: DateTime.now(),
+                  selectionColor: Theme.of(context).secondaryHeaderColor,
+                  selectedTextColor: Theme.of(context).scaffoldBackgroundColor,
+                  locale: 'en_US',
+                  daysCount: 14,
+                  onDateChange: (date) {
+                    setState(() {});
+                  },
+                ),
               ),
             ),
-            ),
-            const Text('Scheduling Appointment', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400)),
+            const Text('Scheduling Appointment',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400)),
             Expanded(
-              child: ListView.builder(
-                padding: EdgeInsets.all(12),
-                itemCount: 4,
-                itemBuilder: (context, index) {
-                  return Card(
-                    child: ListTile(
-                      title: Text(
-                        'CS-133${index + 1}-Computer Science ${index + 1}',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).shadowColor,
-                        ),
+              child: _isLoading
+                  ? Center(
+                      child: CircularProgressIndicator(
+                        color: Theme.of(context).primaryColor,
                       ),
-                        subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                        Text(
-                          'Rob LeGrand',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontStyle: FontStyle.italic,
-                            color: Theme.of(context).hintColor,
-                          ),
+                    )
+                  : _classList.isEmpty
+                      ? Center(child: Text('No classes available'))
+                      : ListView.builder(
+                          padding: EdgeInsets.all(12),
+                          itemCount: _classList.length,
+                          itemBuilder: (context, index) {
+                            final cls = _classList[index];
+                            return Card(
+                              child: ListTile(
+                                title: Text(
+                                  cls['course_name'] ?? 'Unnamed Class',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Theme.of(context).shadowColor,
+                                  ),
+                                ),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      cls['professor_name'] ?? '',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontStyle: FontStyle.italic,
+                                        color: Theme.of(context).hintColor,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                onTap: () => _appointmentAdder(context),
+                              ),
+                            );
+                          },
                         ),
-                        ],
-                        ),
-                      onTap: () => _appointmentAdder(context),
-                    ),
-                  );
-                },
-              ),
             ),
             const SizedBox(height: 28),
           ],

@@ -21,20 +21,25 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
   Future<void> _fetchClasses() async {
     try {
       final classes = await ApiService.getMyClasses();
+      // Sort the classes by course_name
+      classes.sort((a, b) => (a['course_name'] ?? '')
+          .toString()
+          .toLowerCase()
+          .compareTo((b['course_name'] ?? '').toString().toLowerCase()));
       setState(() {
         _classList = classes;
         _isLoading = false;
       });
     } catch (e) {
       setState(() => _isLoading = false);
-      /*ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Failed to  classes: $e")),
-      );*/
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to fetch classes: $e")),
+      );
     }
   }
 
-
-  void _showClassDetailsDialog(BuildContext context, String className, String professorName, String joinCode, String description) {
+  void _showClassDetailsDialog(BuildContext context, String className,
+      String professorName, String joinCode, String description) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -129,7 +134,7 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
               ),
               const SizedBox(height: 10),
               Align(
-                alignment: Alignment.centerLeft,                
+                alignment: Alignment.centerLeft,
                 child: Text(
                   'Class Name',
                   style: TextStyle(
@@ -222,7 +227,7 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
                     fontFamily: 'Poppins',
                     fontSize: 16,
                     fontStyle: FontStyle.italic,
-                    color: Theme.of(context).shadowColor,               
+                    color: Theme.of(context).shadowColor,
                   ),
                 ),
               ),
@@ -273,83 +278,85 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
               },
             ),
             TextButton(
-              child: Text(
-                'Register',
-                style: TextStyle(
-                  color: Theme.of(context).shadowColor,
-                  fontFamily: 'Poppins',
-                  fontSize: 16,
+                child: Text(
+                  'Register',
+                  style: TextStyle(
+                    color: Theme.of(context).shadowColor,
+                    fontFamily: 'Poppins',
+                    fontSize: 16,
+                  ),
                 ),
-              ),
-              onPressed: () async {
-                final className = classController.text.trim();
-                final professorName = professorController.text.trim();
-                final description = descriptionController.text.trim();
+                onPressed: () async {
+                  final className = classController.text.trim();
+                  final professorName = professorController.text.trim();
+                  final description = descriptionController.text.trim();
 
-                if (className.isEmpty || professorName.isEmpty || description.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'Please fill in all fields',
-                        style: TextStyle(fontFamily: 'Poppins', fontSize: 16),
-                      ),
-                      backgroundColor: Colors.redAccent,
-                    ),
-                  );
-                  return;
-                }
-
-                Navigator.of(context).pop(); // Close the input dialog
-                showDialog(
-                  context: context,
-                  barrierDismissible: false,
-                  builder: (_) => const Center(child: CircularProgressIndicator()),
-                );
-
-                try {
-                  final response = await ApiService.createClass(
-                    courseName: className,
-                    professorName: professorName,
-                    courseDescription: description,
-                  );
-                  await Future.delayed(Duration(milliseconds: 20));
-                  if (response["statusCode"] == null) {
-                    throw Exception('Response is null');
-                  }
-                  if (response['course_name'] == className) {
+                  if (className.isEmpty ||
+                      professorName.isEmpty ||
+                      description.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('Class created successfully'),
-                        backgroundColor: Colors.green,
+                        content: Text(
+                          'Please fill in all fields',
+                          style: TextStyle(fontFamily: 'Poppins', fontSize: 16),
+                        ),
+                        backgroundColor: Colors.redAccent,
                       ),
                     );
+                    return;
+                  }
+
+                  Navigator.of(context).pop(); // Close the input dialog
+
+                  // Instead, just set the loading state
                   setState(() {
-                    _isLoading = true; // Show loading indicator while fetching
+                    _isLoading = true;
                   });
-                  await _fetchClasses();
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Failed to verify class creation'),
-                        backgroundColor: Colors.red,
-                      ),
+
+                  try {
+                    final response = await ApiService.createClass(
+                      courseName: className,
+                      professorName: professorName,
+                      courseDescription: description,
                     );
+
+                    if (response["body"] != null &&
+                        response["body"]["course_name"] == className) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Class created successfully'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      }
+
+                      // Refresh the class list
+                      if (mounted) {
+                        await _fetchClasses(); // This will set _isLoading to false when done
+                      }
+                    } else {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Failed to verify class creation'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    }
+                  } catch (e) {
+                    setState(() => _isLoading = false);
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Failed to create class: $e'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
                   }
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Failed to create class: $e'),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                } finally {
-                  if (context.mounted) {
-                    Navigator.of(context, rootNavigator: true).pop(); // Ensure loading dialog is dismissed
-                  }
-                  setState(() {}); // Refresh the class list
-                }
-              }
-            ),
+                }),
           ],
         );
       },
@@ -379,15 +386,20 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Classes', 
-                      style: TextStyle(
-                        fontSize: 24, 
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).shadowColor,
+                      Text(
+                        'Classes',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).shadowColor,
                         ),
                       ),
                       IconButton(
-                        icon: Icon(Icons.add_rounded, color: Theme.of(context).shadowColor, size: 25,),
+                        icon: Icon(
+                          Icons.add_rounded,
+                          color: Theme.of(context).shadowColor,
+                          size: 25,
+                        ),
                         onPressed: () => _classAdder(context),
                       ),
                     ],
@@ -396,32 +408,35 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
                 Container(
                   padding: EdgeInsets.all(15),
                   child: TextField(
-                  decoration: InputDecoration(
-                    hintText: 'Search Classes',
-                    hintStyle: TextStyle(
-                    fontSize: 16,
-                    color: Theme.of(context).hintColor,
-                    fontFamily: 'Poppins',
+                    decoration: InputDecoration(
+                      hintText: 'Search Classes',
+                      hintStyle: TextStyle(
+                        fontSize: 16,
+                        color: Theme.of(context).hintColor,
+                        fontFamily: 'Poppins',
+                      ),
+                      prefixIcon: Icon(
+                        Icons.search,
+                        color: Theme.of(context).shadowColor,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                      filled: true,
+                      fillColor: Theme.of(context).scaffoldBackgroundColor,
                     ),
-                    prefixIcon: Icon(
-                    Icons.search,
-                    color: Theme.of(context).shadowColor,
-                    ),
-                    border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                    ),
-                    filled: true,
-                    fillColor: Theme.of(context).scaffoldBackgroundColor,
-                  ),
-                  onChanged: (value) {
-                    // Add search logic here
-                  },
+                    onChanged: (value) {
+                      // Add search logic here
+                    },
                   ),
                 ),
                 Expanded(
                   child: _isLoading
-                      ? Center(child: CircularProgressIndicator())
+                      ? Center(
+                          child: CircularProgressIndicator(
+                          color: Theme.of(context).primaryColor,
+                        ))
                       : _classList.isEmpty
                           ? Center(child: Text('No classes available'))
                           : ListView.builder(
@@ -432,7 +447,8 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
                                 return Card(
                                   child: ListTile(
                                     leading: CircleAvatar(
-                                      backgroundColor: Theme.of(context).secondaryHeaderColor,
+                                      backgroundColor: Theme.of(context)
+                                          .secondaryHeaderColor,
                                       radius: 32,
                                     ),
                                     title: Text(
@@ -444,7 +460,8 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
                                       ),
                                     ),
                                     subtitle: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           cls['professor_name'] ?? '',
