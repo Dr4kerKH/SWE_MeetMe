@@ -164,14 +164,30 @@ class _ProfessorPage2State extends State<ProfessorPage2> {
                   ),
                   TextButton(
                     child: Text(
-                      'Book',
+                      'Set Time',
                       style: TextStyle(
                         color: Theme.of(context).shadowColor,
                         fontFamily: 'Poppins',
                         fontSize: 16,
                       ),
                     ),
-                    onPressed: () async {},
+                    onPressed: () async {
+                      // Convert selectedTimes (TimeOfDay) to List<String> like '08:00am'
+                      List<String> timeStrings = selectedTimes.map((time) {
+                        final now = DateTime.now();
+                        final dt = DateTime(now.year, now.month, now.day,
+                            time.hour, time.minute);
+                        return TimeOfDay.fromDateTime(dt)
+                            .format(context)
+                            .replaceFirst(' AM', 'am')
+                            .replaceFirst(' PM', 'pm');
+                      }).toList();
+                      await ApiService.setAvaliableTime(
+                        classInfo['course_code'], // <-- fixed here
+                        timeStrings,
+                      );
+                      Navigator.of(context).pop(); // Close dialog after setting
+                    },
                   ),
                 ],
               );
@@ -206,7 +222,7 @@ class _ProfessorPage2State extends State<ProfessorPage2> {
                 ),
               ),
             ),
-            const Text('Scheduling Appointment',
+            const Text('Setect Time for Appointments',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400)),
             Expanded(
               child: _isLoading

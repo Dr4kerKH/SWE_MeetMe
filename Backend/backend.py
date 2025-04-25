@@ -16,7 +16,7 @@ import string
 
 from model import (
     User, UserResponse, Appointment, AppointmentResponse,
-    Class, ClassResponse, UserLogin, Enrollment, EnrollmentResponse
+    Class, ClassResponse, UserLogin, Enrollment, EnrollmentResponse, Avaliable, AvaliableResponse
 )
 
 # Load env variables
@@ -39,7 +39,8 @@ db = client['MeetMeDB']
 users_collection = db['users']
 appointments_collection = db['appointments']
 classes_collection = db['classes']
-enroll_collection = db['enrollments']  # Fixed from 'classes' to 'enrollments'
+enroll_collection = db['enrollments']
+time_avaliable_collection = db ['time_avaliable']
 
 ############################ Security Setup ############################
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -214,3 +215,36 @@ async def delete_appointment(appointment_id: str, current_user: dict = Depends(g
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Appointment not found")
     return {"message": "Appointment deleted successfully"}
+
+@app.post("/classTimeAvailable", response_model=AvaliableResponse)
+async def set_or_append_available_time(payload: Avaliable):
+    course_code = payload.course_code
+    time = payload.time
+
+    existing = time_avaliable_collection.find_one({"course_code": course_code})
+    if existing:
+        existing_times = set(existing.get("time", []))
+        new_times = set(time)
+        updated_times = list(existing_times.union(new_times))
+
+        time_avaliable_collection.update_one(
+            {"course_code": course_code},
+            {"$set": {"time": sorted(updated_times)}}
+        )
+
+        return AvaliableResponse(
+            id=str(existing["_id"]),
+            course_code=course_code,
+            time=sorted(updated_times)
+        )
+    else:
+        time_avaliable = {
+            "course_code": course_code,
+            "time": time
+        }
+        result = time_avaliable_collection.insert_one(time_avaliable)
+        return AvaliableResponse(
+            id=str(result.inserted_id),
+            course_code=course_code,
+            time=time
+        )

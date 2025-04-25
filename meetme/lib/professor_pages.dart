@@ -23,13 +23,14 @@ class _HomePageState extends State<ProfessorHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-       centerTitle: true,
+        centerTitle: true,
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         leading: IconButton(
-          icon: Icon(Icons.person_rounded, color: Theme.of(context).shadowColor),
-            onPressed: () {
-              // Handle user profile action
-            },
+          icon:
+              Icon(Icons.account_circle, color: Theme.of(context).shadowColor),
+          onPressed: () {
+            // Handle user profile action
+          },
         ),
         title: Text(
           'Meet Me',
@@ -42,7 +43,8 @@ class _HomePageState extends State<ProfessorHomePage> {
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.logout_rounded, color: Theme.of(context).shadowColor),
+            icon: Icon(Icons.logout_rounded,
+                color: Theme.of(context).shadowColor),
             onPressed: () {
               // Handle logout
               Navigator.pushAndRemoveUntil(
@@ -109,31 +111,31 @@ class _HomePageState extends State<ProfessorHomePage> {
               //text: 'Home',
               iconActiveColor: Theme.of(context).shadowColor,
               iconColor: Theme.of(context).hintColor,
-              ),
+            ),
             GButton(
-              icon: Icons.dashboard_customize_rounded, 
+              icon: Icons.dashboard_customize_rounded,
               //text: 'Appointments',
               iconActiveColor: Theme.of(context).shadowColor,
               iconColor: Theme.of(context).hintColor,
-              ),
+            ),
             GButton(
-              icon: Icons.web, 
+              icon: Icons.bento_rounded,
               //text: 'Calendar',
               iconActiveColor: Theme.of(context).shadowColor,
               iconColor: Theme.of(context).hintColor,
             ),
             GButton(
-              icon: Icons.add_comment, 
+              icon: Icons.add_comment,
               //text: 'Chat',
               iconActiveColor: Theme.of(context).shadowColor,
               iconColor: Theme.of(context).hintColor,
-              ),  
+            ),
             /*GButton(
               icon: Icons.person_rounded, 
               text: 'Profile',
               iconActiveColor: Theme.of(context).shadowColor,
               iconColor: Theme.of(context).hintColor,
-              ), */ 
+              ), */
           ],
         ),
       ),

@@ -223,4 +223,25 @@ class ApiService {
       throw Exception('Failed to delete appointment: ${response.body}');
     }
   }
+
+  static Future<void> setAvaliableTime(
+      String courseCode, List<String> time) async {
+    final token = await _getToken();
+
+    final response = await http.post(
+      Uri.parse('$baseUrl/classTimeAvailable'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'course_code': courseCode,
+        'time': time,
+      }),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to set available time: ${response.body}');
+    }
+  }
 }

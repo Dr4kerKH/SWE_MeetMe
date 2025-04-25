@@ -1,6 +1,6 @@
 from pydantic import BaseModel, EmailStr
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 
 # --------------------- User Models ---------------------
 class User(BaseModel):
@@ -47,4 +47,12 @@ class Enrollment(BaseModel):
     role: str  # "professor" or "student"
 
 class EnrollmentResponse(Enrollment):
+    id: Optional[str]
+
+# --------------------- Avalibility Models ---------------------
+class Avaliable(BaseModel):
+    course_code: str
+    time: List[str]  # Now a list of times
+
+class AvaliableResponse(Avaliable):
     id: Optional[str]
