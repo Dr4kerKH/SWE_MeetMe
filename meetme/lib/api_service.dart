@@ -11,7 +11,8 @@ class ApiService {
   static const String _roleKey = 'user_role';
 
   //=========================== ACCOUNT ===========================
-  static Future<void> createAccount(String email, String username, String password, String role) async {
+  static Future<void> createAccount(
+      String email, String username, String password, String role) async {
     final emailRegex = RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$");
     if (email.isEmpty || !emailRegex.hasMatch(email)) {
       throw Exception('Invalid email format');
@@ -112,7 +113,7 @@ class ApiService {
     if (response.statusCode == 200) {
       return List<Map<String, dynamic>>.from(jsonDecode(response.body));
     } else {
-      throw Exception('Failed to fetch classes: ${response.body}');
+      throw Exception('${response.body}');
     }
   }
 
@@ -157,7 +158,16 @@ class ApiService {
     if (response.statusCode == 200) {
       return List<Map<String, dynamic>>.from(jsonDecode(response.body));
     } else {
-      throw Exception('Failed to fetch your classes: ${response.body}');
+      // If it's a 404 error with the "User is not enrolled in any classes" message, return an empty list
+      if (response.statusCode == 404) {
+        final errorBody = jsonDecode(response.body);
+        if (errorBody['detail'] == 'User is not enrolled in any classes') {
+          return []; // Return empty list instead of throwing an error
+        }
+      }
+      // Otherwise handle other errors
+      final errorBody = jsonDecode(response.body);
+      throw Exception(errorBody['detail'] ?? 'Failed to fetch your classes');
     }
   }
 

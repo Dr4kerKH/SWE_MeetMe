@@ -141,7 +141,7 @@ async def create_class(cls: Class, current_user: dict = Depends(get_current_user
 
     def generate_unique_course_code():
         while True:
-            code = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+            code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
             if not classes_collection.find_one({"course_code": code}):
                 return code
 

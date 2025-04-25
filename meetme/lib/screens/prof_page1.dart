@@ -12,6 +12,19 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
   List<Map<String, dynamic>> _classList = [];
   bool _isLoading = true;
 
+  // Function to generate a color based on the class name
+  Color _getClassColor(String className) {
+    // Use the hash of the class name to generate a consistent color
+    final hash = className.hashCode;
+    // Create a color with a fixed saturation and brightness but varying hue
+    return HSLColor.fromAHSL(
+      1.0, // Alpha
+      (hash % 360).toDouble(), // Hue (0-360)
+      0.4, // Saturation (0-1)
+      0.5, // Lightness (0-1)
+    ).toColor();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -447,8 +460,8 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
                                 return Card(
                                   child: ListTile(
                                     leading: CircleAvatar(
-                                      backgroundColor: Theme.of(context)
-                                          .secondaryHeaderColor,
+                                      backgroundColor: _getClassColor(
+                                          cls['course_name'] ?? ''),
                                       radius: 32,
                                     ),
                                     title: Text(
@@ -464,7 +477,7 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          cls['professor_name'] ?? '',
+                                          'by ${cls['professor_name'] ?? ''}',
                                           style: TextStyle(
                                             fontSize: 16,
                                             fontStyle: FontStyle.italic,

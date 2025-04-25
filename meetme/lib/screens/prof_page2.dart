@@ -14,6 +14,18 @@ class _ProfessorPage2State extends State<ProfessorPage2> {
   List<Map<String, dynamic>> _filteredClassList = [];
   bool _isLoading = true;
 
+  Color _getClassColor(String className) {
+    // Use the hash of the class name to generate a consistent color
+    final hash = className.hashCode;
+    // Create a color with a fixed saturation and brightness but varying hue
+    return HSLColor.fromAHSL(
+      1.0, // Alpha
+      (hash % 360).toDouble(), // Hue (0-360)
+      0.4, // Saturation (0-1)
+      0.5, // Lightness (0-1)
+    ).toColor();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -36,114 +48,136 @@ class _ProfessorPage2State extends State<ProfessorPage2> {
     } catch (e) {
       setState(() => _isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Failed to fetch classes: $e")),
+        SnackBar(content: Text("$e")),
       );
     }
   }
 
-  Future<void> _appointmentAdder(BuildContext context) {
-    final TextEditingController codeController = TextEditingController();
+  Future<void> _appointmentAdder(
+      BuildContext context, Map<String, dynamic> classInfo) {
+    DateTime selectedDate = DateTime.now();
+    Set<TimeOfDay> selectedTimes = {};
 
     return showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          title: Text(
-            'Book an Appointment',
-            style: TextStyle(
-              fontFamily: 'Poppins',
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).shadowColor,
-            ),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Please select the available time slot',
-                style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontSize: 16,
-                  color: Theme.of(context).shadowColor,
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+            builder: (context, setStateDialog) {
+              return AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
-              ),
-              const SizedBox(height: 20),
-              Wrap(
-                spacing: 8.0,
-                runSpacing: 2.0,
-                children: List.generate(15, (index) {
-                  final startTime = TimeOfDay(
-                      hour: 10 + (index ~/ 2), minute: (index % 2) * 30);
-                  final endTime = TimeOfDay(
-                      hour: startTime.hour, minute: startTime.minute + 29);
-                  return ElevatedButton(
-                    onPressed: () {
-                      // Handle time slot selection logic here
-                      // Adding appointment here into database
-                      // print('Selected time slot: ${startTime.format(context)} - ${endTime.format(context)}');
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).hintColor,
-                      foregroundColor:
-                          Theme.of(context).scaffoldBackgroundColor,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                title: Text(
+                  'Avaliable Time for Appointment',
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).shadowColor,
+                  ),
+                ),
+                content: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Select Multiple Time Slots',
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 16,
+                          color: Theme.of(context).shadowColor,
+                        ),
                       ),
-                    ),
+                      const SizedBox(height: 10),
+                      Wrap(
+                        spacing: 8.0,
+                        runSpacing: 2.0,
+                        children: List.generate(16, (index) {
+                          final startTime = TimeOfDay(
+                              hour: 10 + (index ~/ 2),
+                              minute: (index % 2) * 30);
+                          final endTime = TimeOfDay(
+                              hour: startTime.hour,
+                              minute: startTime.minute + 29);
+                          // Check if this time is in our selected times
+                          final isSelected = selectedTimes.contains(startTime);
+                          return ElevatedButton(
+                            onPressed: () {
+                              setStateDialog(() {
+                                if (isSelected) {
+                                  selectedTimes.remove(startTime);
+                                } else {
+                                  selectedTimes.add(startTime);
+                                }
+                              });
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: isSelected
+                                  ? Theme.of(context).secondaryHeaderColor
+                                  : Theme.of(context).hintColor,
+                              foregroundColor:
+                                  Theme.of(context).scaffoldBackgroundColor,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: Text(
+                              '${(startTime.hour > 12 ? '0' : '')}${startTime.format(context).replaceFirst(' AM', '').replaceFirst(' PM', '')} - ${(endTime.hour > 12 ? '0' : '')}${endTime.format(context).replaceFirst(' AM', 'am').replaceFirst(' PM', 'pm')}',
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: 12,
+                              ),
+                            ),
+                          );
+                        }),
+                      ),
+                      if (selectedTimes.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 16.0),
+                          child: Text(
+                            '${selectedTimes.length} time slots selected',
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).secondaryHeaderColor,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                actions: <Widget>[
+                  TextButton(
                     child: Text(
-                      '${startTime.format(context).replaceFirst(' AM', '').replaceFirst(' PM', '')}-${endTime.format(context).replaceFirst(' AM', 'am').replaceFirst(' PM', 'pm')}',
+                      'Cancel',
                       style: TextStyle(
+                        color: Theme.of(context).secondaryHeaderColor,
                         fontFamily: 'Poppins',
-                        fontSize: 12,
+                        fontSize: 16,
                       ),
                     ),
-                  );
-                }),
-              ),
-            ],
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text(
-                'Cancel',
-                style: TextStyle(
-                  color: Theme.of(context).secondaryHeaderColor,
-                  fontFamily: 'Poppins',
-                  fontSize: 16,
-                ),
-              ),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text(
-                'Register',
-                style: TextStyle(
-                  color: Theme.of(context).shadowColor,
-                  fontFamily: 'Poppins',
-                  fontSize: 16,
-                ),
-              ),
-              onPressed: () {
-                final classCode = codeController.text;
-                if (classCode.isNotEmpty) {
-                  // Handle class registration logic here
-                  // Where it should search the class in DB and add it to classes' list
-                  // print('Class registered with code: $classCode');
-                }
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  TextButton(
+                    child: Text(
+                      'Book',
+                      style: TextStyle(
+                        color: Theme.of(context).shadowColor,
+                        fontFamily: 'Poppins',
+                        fontSize: 16,
+                      ),
+                    ),
+                    onPressed: () async {},
+                  ),
+                ],
+              );
+            },
+          );
+        });
   }
 
   @override
@@ -190,6 +224,11 @@ class _ProfessorPage2State extends State<ProfessorPage2> {
                             final cls = _classList[index];
                             return Card(
                               child: ListTile(
+                                leading: CircleAvatar(
+                                  backgroundColor:
+                                      _getClassColor(cls['course_name'] ?? ''),
+                                  radius: 32,
+                                ),
                                 title: Text(
                                   cls['course_name'] ?? 'Unnamed Class',
                                   style: TextStyle(
@@ -202,7 +241,7 @@ class _ProfessorPage2State extends State<ProfessorPage2> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      cls['professor_name'] ?? '',
+                                      'by ${cls['professor_name'] ?? ''}',
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontStyle: FontStyle.italic,
@@ -211,7 +250,7 @@ class _ProfessorPage2State extends State<ProfessorPage2> {
                                     ),
                                   ],
                                 ),
-                                onTap: () => _appointmentAdder(context),
+                                onTap: () => _appointmentAdder(context, cls),
                               ),
                             );
                           },
