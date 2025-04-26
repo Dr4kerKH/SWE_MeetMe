@@ -21,13 +21,21 @@ class _HomePageState extends State<ProfessorHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isPortrait =
+        MediaQuery.of(context).orientation == Orientation.portrait;
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         leading: IconButton(
-          icon:
-              Icon(Icons.account_circle, color: Theme.of(context).shadowColor),
+          icon: Icon(
+            Icons.account_circle,
+            color: Theme.of(context).shadowColor,
+            size: screenWidth * 0.07,
+          ),
           onPressed: () {
             // Handle user profile action
           },
@@ -36,15 +44,18 @@ class _HomePageState extends State<ProfessorHomePage> {
           'Meet Me',
           style: TextStyle(
             color: Theme.of(context).shadowColor,
-            fontSize: 24,
+            fontSize: screenWidth * 0.06,
             fontFamily: 'Poppins',
             fontWeight: FontWeight.w600,
           ),
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.logout_rounded,
-                color: Theme.of(context).shadowColor),
+            icon: Icon(
+              Icons.logout_rounded,
+              color: Theme.of(context).shadowColor,
+              size: screenWidth * 0.07,
+            ),
             onPressed: () {
               // Handle logout
               Navigator.pushAndRemoveUntil(
@@ -79,28 +90,32 @@ class _HomePageState extends State<ProfessorHomePage> {
               controller: _controller,
               count: 4,
               effect: WormEffect(
-                dotHeight: 10,
-                dotWidth: 10,
+                dotHeight: screenWidth * 0.025,
+                dotWidth: screenWidth * 0.025,
                 activeDotColor: Theme.of(context).shadowColor,
                 dotColor: Theme.of(context).hintColor,
+                spacing: screenWidth * 0.02,
               ),
             ),
           ),
         ],
       ),
       bottomNavigationBar: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 0),
+        padding: EdgeInsets.symmetric(
+          horizontal: screenWidth * 0.04,
+          vertical: screenHeight * 0.01,
+        ),
         child: GNav(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          gap: 8,
-          padding: EdgeInsets.all(16),
+          gap: screenWidth * 0.02,
+          padding: EdgeInsets.all(screenWidth * 0.04),
           selectedIndex: _bottomNavIndex,
           onTabChange: (index) {
             setState(() {
               _bottomNavIndex = index;
               _controller.animateToPage(
                 index,
-                duration: Duration(milliseconds: 600),
+                duration: const Duration(milliseconds: 600),
                 curve: Curves.easeInOut,
               );
             });
@@ -108,25 +123,25 @@ class _HomePageState extends State<ProfessorHomePage> {
           tabs: [
             GButton(
               icon: Icons.home_rounded,
-              //text: 'Home',
+              iconSize: screenWidth * 0.07,
               iconActiveColor: Theme.of(context).shadowColor,
               iconColor: Theme.of(context).hintColor,
             ),
             GButton(
               icon: Icons.dashboard_customize_rounded,
-              //text: 'Appointments',
+              iconSize: screenWidth * 0.07,
               iconActiveColor: Theme.of(context).shadowColor,
               iconColor: Theme.of(context).hintColor,
             ),
             GButton(
               icon: Icons.bento_rounded,
-              //text: 'Calendar',
+              iconSize: screenWidth * 0.07,
               iconActiveColor: Theme.of(context).shadowColor,
               iconColor: Theme.of(context).hintColor,
             ),
             GButton(
               icon: Icons.add_comment,
-              //text: 'Chat',
+              iconSize: screenWidth * 0.07,
               iconActiveColor: Theme.of(context).shadowColor,
               iconColor: Theme.of(context).hintColor,
             ),

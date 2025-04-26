@@ -46,19 +46,29 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
     } catch (e) {
       setState(() => _isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Failed to fetch classes: $e")),
+        SnackBar(
+          content: Text(
+            "Failed to fetch classes: $e",
+            style: TextStyle(
+              fontSize: MediaQuery.of(context).size.width * 0.04,
+            ),
+          ),
+        ),
       );
     }
   }
 
   void _showClassDetailsDialog(BuildContext context, String className,
       String professorName, String joinCode, String description) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(screenWidth * 0.04),
           ),
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           content: Column(
@@ -69,37 +79,37 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
                 className,
                 style: TextStyle(
                   fontFamily: 'Poppins',
-                  fontSize: 20,
+                  fontSize: screenWidth * 0.05,
                   fontWeight: FontWeight.bold,
                   color: Theme.of(context).shadowColor,
                 ),
               ),
-              const SizedBox(height: 2),
+              SizedBox(height: screenHeight * 0.002),
               Text(
                 'By $professorName',
                 style: TextStyle(
                   fontFamily: 'Poppins',
-                  fontSize: 14,
+                  fontSize: screenWidth * 0.035,
                   fontWeight: FontWeight.bold,
                   fontStyle: FontStyle.italic,
                   color: Theme.of(context).shadowColor,
                 ),
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: screenHeight * 0.01),
               Text(
                 description,
                 style: TextStyle(
                   fontFamily: 'Poppins',
-                  fontSize: 14,
+                  fontSize: screenWidth * 0.035,
                   color: Theme.of(context).hintColor,
                 ),
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: screenHeight * 0.01),
               Text(
                 'Join Code: $joinCode',
                 style: TextStyle(
                   fontFamily: 'Poppins',
-                  fontSize: 20,
+                  fontSize: screenWidth * 0.05,
                   fontWeight: FontWeight.bold,
                   color: Theme.of(context).shadowColor,
                 ),
@@ -112,6 +122,8 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
   }
 
   Future<void> _classAdder(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
     final TextEditingController classController = TextEditingController();
     final TextEditingController professorController = TextEditingController();
     final TextEditingController descriptionController = TextEditingController();
@@ -121,14 +133,14 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
       builder: (BuildContext context) {
         return AlertDialog(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(screenWidth * 0.03),
           ),
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           title: Text(
             'Class Creation',
             style: TextStyle(
               fontFamily: 'Poppins',
-              fontSize: 20,
+              fontSize: screenWidth * 0.05,
               fontWeight: FontWeight.bold,
               color: Theme.of(context).shadowColor,
             ),
@@ -141,18 +153,18 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
                 'Please fill in the class informations',
                 style: TextStyle(
                   fontFamily: 'Poppins',
-                  fontSize: 16,
+                  fontSize: screenWidth * 0.04,
                   color: Theme.of(context).shadowColor,
                 ),
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: screenHeight * 0.01),
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
                   'Class Name',
                   style: TextStyle(
                     fontFamily: 'Poppins',
-                    fontSize: 16,
+                    fontSize: screenWidth * 0.04,
                     fontStyle: FontStyle.italic,
                     color: Theme.of(context).shadowColor,
                   ),
@@ -160,6 +172,9 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
               ),
               TextField(
                 controller: classController,
+                style: TextStyle(
+                  fontSize: screenWidth * 0.04,
+                ),
                 decoration: InputDecoration(
                   border: UnderlineInputBorder(
                     borderSide: BorderSide(
@@ -182,20 +197,20 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
                   hintText: '(Ex: CS-4399-Senior Project Design)',
                   hintStyle: TextStyle(
                     fontFamily: 'Poppins',
-                    fontSize: 12,
+                    fontSize: screenWidth * 0.03,
                     color: Theme.of(context).hintColor,
                     fontStyle: FontStyle.italic,
                   ),
                 ),
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: screenHeight * 0.01),
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
                   'Professor Name',
                   style: TextStyle(
                     fontFamily: 'Poppins',
-                    fontSize: 16,
+                    fontSize: screenWidth * 0.04,
                     fontStyle: FontStyle.italic,
                     color: Theme.of(context).shadowColor,
                   ),
@@ -203,6 +218,9 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
               ),
               TextField(
                 controller: professorController,
+                style: TextStyle(
+                  fontSize: screenWidth * 0.04,
+                ),
                 decoration: InputDecoration(
                   border: UnderlineInputBorder(
                     borderSide: BorderSide(
@@ -225,20 +243,20 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
                   hintText: '(Ex: Dr.Rafael)',
                   hintStyle: TextStyle(
                     fontFamily: 'Poppins',
-                    fontSize: 12,
+                    fontSize: screenWidth * 0.03,
                     color: Theme.of(context).hintColor,
                     fontStyle: FontStyle.italic,
                   ),
                 ),
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: screenHeight * 0.01),
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
                   'Class Description',
                   style: TextStyle(
                     fontFamily: 'Poppins',
-                    fontSize: 16,
+                    fontSize: screenWidth * 0.04,
                     fontStyle: FontStyle.italic,
                     color: Theme.of(context).shadowColor,
                   ),
@@ -246,6 +264,9 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
               ),
               TextField(
                 controller: descriptionController,
+                style: TextStyle(
+                  fontSize: screenWidth * 0.04,
+                ),
                 decoration: InputDecoration(
                   border: UnderlineInputBorder(
                     borderSide: BorderSide(
@@ -265,10 +286,10 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
                       width: 1.0,
                     ),
                   ),
-                  hintText: '',
+                  hintText: '(Ex: This is a senior project design class...)',
                   hintStyle: TextStyle(
                     fontFamily: 'Poppins',
-                    fontSize: 16,
+                    fontSize: screenWidth * 0.03,
                     color: Theme.of(context).hintColor,
                     fontStyle: FontStyle.italic,
                   ),
@@ -276,100 +297,67 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
               ),
             ],
           ),
-          actions: <Widget>[
+          actions: [
             TextButton(
-              child: Text(
-                'Cancel',
-                style: TextStyle(
-                  color: Theme.of(context).secondaryHeaderColor,
-                  fontFamily: 'Poppins',
-                  fontSize: 16,
-                ),
-              ),
               onPressed: () {
                 Navigator.of(context).pop();
               },
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: screenWidth * 0.04,
+                  color: Theme.of(context).shadowColor,
+                ),
+              ),
             ),
             TextButton(
-                child: Text(
-                  'Register',
-                  style: TextStyle(
-                    color: Theme.of(context).shadowColor,
-                    fontFamily: 'Poppins',
-                    fontSize: 16,
-                  ),
-                ),
-                onPressed: () async {
-                  final className = classController.text.trim();
-                  final professorName = professorController.text.trim();
-                  final description = descriptionController.text.trim();
-
-                  if (className.isEmpty ||
-                      professorName.isEmpty ||
-                      description.isEmpty) {
+              onPressed: () async {
+                if (classController.text.isNotEmpty &&
+                    professorController.text.isNotEmpty &&
+                    descriptionController.text.isNotEmpty) {
+                  try {
+                    await ApiService.createClass(
+                      courseName: classController.text,
+                      professorName: professorController.text,
+                      courseDescription: descriptionController.text,
+                    );
+                    Navigator.of(context).pop();
+                    _fetchClasses();
+                  } catch (e) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
-                          'Please fill in all fields',
-                          style: TextStyle(fontFamily: 'Poppins', fontSize: 16),
+                          "Failed to create class: $e",
+                          style: TextStyle(
+                            fontSize: screenWidth * 0.04,
+                          ),
                         ),
-                        backgroundColor: Colors.redAccent,
                       ),
                     );
-                    return;
                   }
-
-                  Navigator.of(context).pop(); // Close the input dialog
-
-                  // Instead, just set the loading state
-                  setState(() {
-                    _isLoading = true;
-                  });
-
-                  try {
-                    final response = await ApiService.createClass(
-                      courseName: className,
-                      professorName: professorName,
-                      courseDescription: description,
-                    );
-
-                    if (response["body"] != null &&
-                        response["body"]["course_name"] == className) {
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Class created successfully'),
-                            backgroundColor: Colors.green,
-                          ),
-                        );
-                      }
-
-                      // Refresh the class list
-                      if (mounted) {
-                        await _fetchClasses(); // This will set _isLoading to false when done
-                      }
-                    } else {
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Failed to verify class creation'),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                      }
-                    }
-                  } catch (e) {
-                    setState(() => _isLoading = false);
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Failed to create class: $e'),
-                          backgroundColor: Colors.red,
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        "Please fill in all fields",
+                        style: TextStyle(
+                          fontSize: screenWidth * 0.04,
                         ),
-                      );
-                    }
-                  }
-                }),
+                      ),
+                    ),
+                  );
+                }
+              },
+              child: Text(
+                'Create',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: screenWidth * 0.04,
+                  color: Theme.of(context).shadowColor,
+                ),
+              ),
+            ),
           ],
         );
       },
@@ -378,140 +366,110 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isPortrait =
+        MediaQuery.of(context).orientation == Orientation.portrait;
+
     return Scaffold(
-      body: Stack(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Theme.of(context).scaffoldBackgroundColor,
-                  Theme.of(context).scaffoldBackgroundColor,
-                ],
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: _isLoading
+          ? Center(
+              child: CircularProgressIndicator(
+                color: Theme.of(context).shadowColor,
               ),
-            ),
-            child: Column(
+            )
+          : Column(
               children: [
-                Container(
-                  padding: EdgeInsets.all(8),
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: screenWidth * 0.04,
+                    vertical: screenHeight * 0.02,
+                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Classes',
+                        'My Classes',
                         style: TextStyle(
-                          fontSize: 24,
+                          fontFamily: 'Poppins',
+                          fontSize: screenWidth * 0.06,
                           fontWeight: FontWeight.bold,
                           color: Theme.of(context).shadowColor,
                         ),
                       ),
                       IconButton(
                         icon: Icon(
-                          Icons.add_rounded,
+                          Icons.add_circle_outline,
                           color: Theme.of(context).shadowColor,
-                          size: 25,
+                          size: screenWidth * 0.08,
                         ),
                         onPressed: () => _classAdder(context),
                       ),
                     ],
                   ),
                 ),
-                Container(
-                  padding: EdgeInsets.all(15),
-                  child: TextField(
-                    decoration: InputDecoration(
-                      hintText: 'Search Classes',
-                      hintStyle: TextStyle(
-                        fontSize: 16,
-                        color: Theme.of(context).hintColor,
-                        fontFamily: 'Poppins',
-                      ),
-                      prefixIcon: Icon(
-                        Icons.search,
-                        color: Theme.of(context).shadowColor,
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                      filled: true,
-                      fillColor: Theme.of(context).scaffoldBackgroundColor,
-                    ),
-                    onChanged: (value) {
-                      // Add search logic here
-                    },
-                  ),
-                ),
                 Expanded(
-                  child: _isLoading
+                  child: _classList.isEmpty
                       ? Center(
-                          child: CircularProgressIndicator(
-                          color: Theme.of(context).primaryColor,
-                        ))
-                      : _classList.isEmpty
-                          ? Center(child: Text('No classes available'))
-                          : ListView.builder(
-                              padding: EdgeInsets.all(12),
-                              itemCount: _classList.length,
-                              itemBuilder: (context, index) {
-                                final cls = _classList[index];
-                                return Card(
-                                  child: ListTile(
-                                    leading: CircleAvatar(
-                                      backgroundColor: _getClassColor(
-                                          cls['course_name'] ?? ''),
-                                      radius: 32,
-                                    ),
-                                    title: Text(
-                                      cls['course_name'] ?? 'Unnamed Class',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: Theme.of(context).shadowColor,
-                                      ),
-                                    ),
-                                    subtitle: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'by ${cls['professor_name'] ?? ''}',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontStyle: FontStyle.italic,
-                                            color: Theme.of(context).hintColor,
-                                          ),
-                                        ),
-                                        SizedBox(height: 4),
-                                        Text(
-                                          cls['course_description'] ?? '',
-                                          style: TextStyle(
-                                            fontSize: 10,
-                                            color: Theme.of(context).hintColor,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    onTap: () => _showClassDetailsDialog(
-                                      context,
-                                      cls['course_name'] ?? '',
-                                      cls['professor_name'] ?? '',
-                                      cls['course_code'] ?? '',
-                                      cls['course_description'] ?? '',
-                                    ),
-                                  ),
-                                );
-                              },
+                          child: Text(
+                            'No classes found',
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: screenWidth * 0.05,
+                              color: Theme.of(context).hintColor,
                             ),
+                          ),
+                        )
+                      : ListView.builder(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: screenWidth * 0.04,
+                            vertical: screenHeight * 0.01,
+                          ),
+                          itemCount: _classList.length,
+                          itemBuilder: (context, index) {
+                            final classInfo = _classList[index];
+                            return Card(
+                              margin:
+                                  EdgeInsets.only(bottom: screenHeight * 0.015),
+                              shape: RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.circular(screenWidth * 0.03),
+                              ),
+                              color: _getClassColor(
+                                  classInfo['course_name'] ?? ''),
+                              child: ListTile(
+                                title: Text(
+                                  classInfo['course_name'] ?? '',
+                                  style: TextStyle(
+                                    fontFamily: 'Poppins',
+                                    fontSize: screenWidth * 0.045,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                subtitle: Text(
+                                  'By ${classInfo['professor_name'] ?? ''}',
+                                  style: TextStyle(
+                                    fontFamily: 'Poppins',
+                                    fontSize: screenWidth * 0.035,
+                                    color: Colors.white.withOpacity(0.8),
+                                  ),
+                                ),
+                                onTap: () => _showClassDetailsDialog(
+                                  context,
+                                  classInfo['course_name'] ?? '',
+                                  classInfo['professor_name'] ?? '',
+                                  classInfo['join_code'] ?? '',
+                                  classInfo['description'] ?? '',
+                                ),
+                              ),
+                            );
+                          },
+                        ),
                 ),
-                const SizedBox(height: 28),
               ],
             ),
-          ),
-        ],
-      ),
     );
   }
 }

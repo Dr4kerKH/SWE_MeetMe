@@ -48,13 +48,22 @@ class _ProfessorPage2State extends State<ProfessorPage2> {
     } catch (e) {
       setState(() => _isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("$e")),
+        SnackBar(
+          content: Text(
+            "$e",
+            style: TextStyle(
+              fontSize: MediaQuery.of(context).size.width * 0.04,
+            ),
+          ),
+        ),
       );
     }
   }
 
   Future<void> _appointmentAdder(
       BuildContext context, Map<String, dynamic> classInfo) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
     DateTime selectedDate = DateTime.now();
     Set<TimeOfDay> selectedTimes = {};
 
@@ -65,14 +74,14 @@ class _ProfessorPage2State extends State<ProfessorPage2> {
             builder: (context, setStateDialog) {
               return AlertDialog(
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(screenWidth * 0.03),
                 ),
                 backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                 title: Text(
-                  'Avaliable Time for Appointment',
+                  'Available Time for Appointment',
                   style: TextStyle(
                     fontFamily: 'Poppins',
-                    fontSize: 18,
+                    fontSize: screenWidth * 0.05,
                     fontWeight: FontWeight.bold,
                     color: Theme.of(context).shadowColor,
                   ),
@@ -85,14 +94,14 @@ class _ProfessorPage2State extends State<ProfessorPage2> {
                         'Select Multiple Time Slots',
                         style: TextStyle(
                           fontFamily: 'Poppins',
-                          fontSize: 16,
+                          fontSize: screenWidth * 0.045,
                           color: Theme.of(context).shadowColor,
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      SizedBox(height: screenHeight * 0.01),
                       Wrap(
-                        spacing: 8.0,
-                        runSpacing: 2.0,
+                        spacing: screenWidth * 0.02,
+                        runSpacing: screenHeight * 0.005,
                         children: List.generate(16, (index) {
                           final startTime = TimeOfDay(
                               hour: 10 + (index ~/ 2),
@@ -119,14 +128,15 @@ class _ProfessorPage2State extends State<ProfessorPage2> {
                               foregroundColor:
                                   Theme.of(context).scaffoldBackgroundColor,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
+                                borderRadius:
+                                    BorderRadius.circular(screenWidth * 0.02),
                               ),
                             ),
                             child: Text(
                               '${(startTime.hour > 12 ? '0' : '')}${startTime.format(context).replaceFirst(' AM', '').replaceFirst(' PM', '')} - ${(endTime.hour > 12 ? '0' : '')}${endTime.format(context).replaceFirst(' AM', 'am').replaceFirst(' PM', 'pm')}',
                               style: TextStyle(
                                 fontFamily: 'Poppins',
-                                fontSize: 12,
+                                fontSize: screenWidth * 0.035,
                               ),
                             ),
                           );
@@ -134,12 +144,12 @@ class _ProfessorPage2State extends State<ProfessorPage2> {
                       ),
                       if (selectedTimes.isNotEmpty)
                         Padding(
-                          padding: const EdgeInsets.only(top: 16.0),
+                          padding: EdgeInsets.only(top: screenHeight * 0.02),
                           child: Text(
                             '${selectedTimes.length} time slots selected',
                             style: TextStyle(
                               fontFamily: 'Poppins',
-                              fontSize: 14,
+                              fontSize: screenWidth * 0.04,
                               fontWeight: FontWeight.bold,
                               color: Theme.of(context).secondaryHeaderColor,
                             ),
@@ -155,7 +165,7 @@ class _ProfessorPage2State extends State<ProfessorPage2> {
                       style: TextStyle(
                         color: Theme.of(context).secondaryHeaderColor,
                         fontFamily: 'Poppins',
-                        fontSize: 16,
+                        fontSize: screenWidth * 0.045,
                       ),
                     ),
                     onPressed: () {
@@ -168,7 +178,7 @@ class _ProfessorPage2State extends State<ProfessorPage2> {
                       style: TextStyle(
                         color: Theme.of(context).shadowColor,
                         fontFamily: 'Poppins',
-                        fontSize: 16,
+                        fontSize: screenWidth * 0.045,
                       ),
                     ),
                     onPressed: () async {
@@ -183,7 +193,7 @@ class _ProfessorPage2State extends State<ProfessorPage2> {
                             .replaceFirst(' PM', 'pm');
                       }).toList();
                       await ApiService.setAvaliableTime(
-                        classInfo['course_code'], // <-- fixed here
+                        classInfo['course_code'],
                         timeStrings,
                       );
                       Navigator.of(context).pop(); // Close dialog after setting
@@ -198,19 +208,24 @@ class _ProfessorPage2State extends State<ProfessorPage2> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isPortrait =
+        MediaQuery.of(context).orientation == Orientation.portrait;
+
     return Scaffold(
       body: Container(
         color: Theme.of(context).scaffoldBackgroundColor,
         child: Column(
           children: [
-            const SizedBox(height: 10.0),
+            SizedBox(height: screenHeight * 0.01),
             SingleChildScrollView(
               child: Container(
-                padding: const EdgeInsets.all(12.0),
+                padding: EdgeInsets.all(screenWidth * 0.03),
                 child: DatePicker(
                   DateTime.now(),
-                  height: 120,
-                  width: 60,
+                  height: screenHeight * 0.15,
+                  width: screenWidth * 0.15,
                   initialSelectedDate: DateTime.now(),
                   selectionColor: Theme.of(context).secondaryHeaderColor,
                   selectedTextColor: Theme.of(context).scaffoldBackgroundColor,
@@ -222,8 +237,14 @@ class _ProfessorPage2State extends State<ProfessorPage2> {
                 ),
               ),
             ),
-            const Text('Setect Time for Appointments',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400)),
+            Text(
+              'Select Time for Appointments',
+              style: TextStyle(
+                fontSize: screenWidth * 0.05,
+                fontWeight: FontWeight.w400,
+                fontFamily: 'Poppins',
+              ),
+            ),
             Expanded(
               child: _isLoading
                   ? Center(
@@ -232,39 +253,47 @@ class _ProfessorPage2State extends State<ProfessorPage2> {
                       ),
                     )
                   : _classList.isEmpty
-                      ? Center(child: Text('No classes available'))
+                      ? Center(
+                          child: Text(
+                            'No classes available',
+                            style: TextStyle(
+                              fontSize: screenWidth * 0.045,
+                              fontFamily: 'Poppins',
+                            ),
+                          ),
+                        )
                       : ListView.builder(
-                          padding: EdgeInsets.all(12),
+                          padding: EdgeInsets.all(screenWidth * 0.03),
                           itemCount: _classList.length,
                           itemBuilder: (context, index) {
                             final cls = _classList[index];
                             return Card(
+                              margin:
+                                  EdgeInsets.only(bottom: screenHeight * 0.01),
+                              shape: RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.circular(screenWidth * 0.03),
+                              ),
                               child: ListTile(
                                 leading: CircleAvatar(
                                   backgroundColor:
                                       _getClassColor(cls['course_name'] ?? ''),
-                                  radius: 32,
+                                  radius: screenWidth * 0.08,
                                 ),
                                 title: Text(
                                   cls['course_name'] ?? 'Unnamed Class',
                                   style: TextStyle(
-                                    fontSize: 16,
+                                    fontSize: screenWidth * 0.045,
+                                    fontFamily: 'Poppins',
                                     fontWeight: FontWeight.bold,
-                                    color: Theme.of(context).shadowColor,
                                   ),
                                 ),
-                                subtitle: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'by ${cls['professor_name'] ?? ''}',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontStyle: FontStyle.italic,
-                                        color: Theme.of(context).hintColor,
-                                      ),
-                                    ),
-                                  ],
+                                subtitle: Text(
+                                  cls['professor_name'] ?? 'Unknown Professor',
+                                  style: TextStyle(
+                                    fontSize: screenWidth * 0.035,
+                                    fontFamily: 'Poppins',
+                                  ),
                                 ),
                                 onTap: () => _appointmentAdder(context, cls),
                               ),
@@ -272,7 +301,6 @@ class _ProfessorPage2State extends State<ProfessorPage2> {
                           },
                         ),
             ),
-            const SizedBox(height: 28),
           ],
         ),
       ),

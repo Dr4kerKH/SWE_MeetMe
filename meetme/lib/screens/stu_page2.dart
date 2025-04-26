@@ -9,11 +9,9 @@ class StudentPage2 extends StatefulWidget {
 }
 
 class _StudentPage2State extends State<StudentPage2> {
-  
-
-
   Future<void> _appointmentAdder(BuildContext context) {
-    
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
     final TextEditingController codeController = TextEditingController();
 
     return showDialog<void>(
@@ -21,14 +19,14 @@ class _StudentPage2State extends State<StudentPage2> {
       builder: (BuildContext context) {
         return AlertDialog(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(screenWidth * 0.03),
           ),
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           title: Text(
             'Book an Appointment',
             style: TextStyle(
               fontFamily: 'Poppins',
-              fontSize: 20,
+              fontSize: screenWidth * 0.05,
               fontWeight: FontWeight.bold,
               color: Theme.of(context).shadowColor,
             ),
@@ -37,20 +35,22 @@ class _StudentPage2State extends State<StudentPage2> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-              'Please select the available time slot',
-              style: TextStyle(
-                fontFamily: 'Poppins',
-                fontSize: 16,
-                color: Theme.of(context).shadowColor,
+                'Please select the available time slot',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: screenWidth * 0.04,
+                  color: Theme.of(context).shadowColor,
+                ),
               ),
-              ),
-              const SizedBox(height: 20),
+              SizedBox(height: screenHeight * 0.02),
               Wrap(
-                spacing: 8.0,
-                runSpacing: 2.0,
+                spacing: screenWidth * 0.02,
+                runSpacing: screenHeight * 0.005,
                 children: List.generate(15, (index) {
-                  final startTime = TimeOfDay(hour: 10 + (index ~/ 2), minute: (index % 2) * 30);
-                  final endTime = TimeOfDay(hour: startTime.hour, minute: startTime.minute + 29);
+                  final startTime = TimeOfDay(
+                      hour: 10 + (index ~/ 2), minute: (index % 2) * 30);
+                  final endTime = TimeOfDay(
+                      hour: startTime.hour, minute: startTime.minute + 29);
                   return ElevatedButton(
                     onPressed: () {
                       // Handle time slot selection logic here
@@ -59,21 +59,21 @@ class _StudentPage2State extends State<StudentPage2> {
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Theme.of(context).hintColor,
-                      foregroundColor: Theme.of(context).scaffoldBackgroundColor,
+                      foregroundColor:
+                          Theme.of(context).scaffoldBackgroundColor,
                       shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(screenWidth * 0.02),
                       ),
                     ),
                     child: Text(
                       '${startTime.format(context).replaceFirst(' AM', '').replaceFirst(' PM', '')}-${endTime.format(context).replaceFirst(' AM', 'am').replaceFirst(' PM', 'pm')}',
                       style: TextStyle(
-                      fontFamily: 'Poppins',
-                      fontSize: 12,
+                        fontFamily: 'Poppins',
+                        fontSize: screenWidth * 0.035,
                       ),
                     ),
                   );
-                }
-                ),
+                }),
               ),
             ],
           ),
@@ -84,7 +84,7 @@ class _StudentPage2State extends State<StudentPage2> {
                 style: TextStyle(
                   color: Theme.of(context).secondaryHeaderColor,
                   fontFamily: 'Poppins',
-                  fontSize: 16,
+                  fontSize: screenWidth * 0.04,
                 ),
               ),
               onPressed: () {
@@ -97,7 +97,7 @@ class _StudentPage2State extends State<StudentPage2> {
                 style: TextStyle(
                   color: Theme.of(context).shadowColor,
                   fontFamily: 'Poppins',
-                  fontSize: 16,
+                  fontSize: screenWidth * 0.04,
                 ),
               ),
               onPressed: () {
@@ -115,72 +115,87 @@ class _StudentPage2State extends State<StudentPage2> {
       },
     );
   }
-  
-  
+
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isPortrait =
+        MediaQuery.of(context).orientation == Orientation.portrait;
+
     return Scaffold(
       body: Container(
         color: Theme.of(context).scaffoldBackgroundColor,
         child: Column(
           children: [
-            const SizedBox(height: 10.0),
+            SizedBox(height: screenHeight * 0.01),
             SingleChildScrollView(
-            child: Container(
-              padding: const EdgeInsets.all(12.0),
-              child: DatePicker(
-                DateTime.now(),
-                //controller: _datePickerController,
-                height: 120,
-                width: 60,
-                initialSelectedDate:  DateTime.now(),
-                selectionColor: Theme.of(context).secondaryHeaderColor,
-                selectedTextColor: Theme.of(context).scaffoldBackgroundColor,
-                locale: 'en_US',
-                daysCount: 14,
-                onDateChange: (date) {
-                  setState(() {
-                  });
-                },
+              child: Container(
+                padding: EdgeInsets.all(screenWidth * 0.03),
+                child: DatePicker(
+                  DateTime.now(),
+                  height: screenHeight * 0.15,
+                  width: screenWidth * 0.15,
+                  initialSelectedDate: DateTime.now(),
+                  selectionColor: Theme.of(context).secondaryHeaderColor,
+                  selectedTextColor: Theme.of(context).scaffoldBackgroundColor,
+                  locale: 'en_US',
+                  daysCount: 14,
+                  onDateChange: (date) {
+                    setState(() {});
+                  },
+                ),
               ),
             ),
+            Text(
+              'Scheduling Appointment',
+              style: TextStyle(
+                fontSize: screenWidth * 0.05,
+                fontWeight: FontWeight.w400,
+                fontFamily: 'Poppins',
+              ),
             ),
-            const Text('Scheduling Appointment', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400)),
             Expanded(
               child: ListView.builder(
-                padding: EdgeInsets.all(12),
+                padding: EdgeInsets.all(screenWidth * 0.03),
                 itemCount: 7,
                 itemBuilder: (context, index) {
                   return Card(
+                    margin: EdgeInsets.only(bottom: screenHeight * 0.01),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(screenWidth * 0.03),
+                    ),
                     child: ListTile(
                       title: Text(
                         'CS-133${index + 1}-Computer Science ${index + 1}',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: screenWidth * 0.04,
                           fontWeight: FontWeight.bold,
                           color: Theme.of(context).shadowColor,
+                          fontFamily: 'Poppins',
                         ),
                       ),
-                        subtitle: Column(
+                      subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                        Text(
-                          'Rob LeGrand',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontStyle: FontStyle.italic,
-                            color: Theme.of(context).hintColor,
+                          Text(
+                            'Rob LeGrand',
+                            style: TextStyle(
+                              fontSize: screenWidth * 0.035,
+                              fontStyle: FontStyle.italic,
+                              color: Theme.of(context).hintColor,
+                              fontFamily: 'Poppins',
+                            ),
                           ),
-                        ),
                         ],
-                        ),
+                      ),
                       onTap: () => _appointmentAdder(context),
                     ),
                   );
                 },
               ),
             ),
-            const SizedBox(height: 28),
+            SizedBox(height: screenHeight * 0.01),
           ],
         ),
       ),

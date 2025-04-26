@@ -10,89 +10,99 @@ class ProfessorPage3 extends StatefulWidget {
 }
 
 class _ProfessorPage3State extends State<ProfessorPage3> {
-
   DateTime _selectedDate = DateTime.now();
   final DatePickerController _datePickerController = DatePickerController();
   final CalendarController _calendarController = CalendarController();
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isPortrait =
+        MediaQuery.of(context).orientation == Orientation.portrait;
+
     return Scaffold(
       body: Container(
         color: Theme.of(context).scaffoldBackgroundColor,
         child: Column(
           children: [
-            const SizedBox(height: 10.0),
+            SizedBox(height: screenHeight * 0.01),
             SingleChildScrollView(
-            child: Container(
-              padding: const EdgeInsets.all(12.0),
-              child: DatePicker(
-                DateTime.now(),
-                controller: _datePickerController,
-                height: 120,
-                width: 60,
-                initialSelectedDate:  _selectedDate,
-                selectionColor: Theme.of(context).secondaryHeaderColor,
-                selectedTextColor: Theme.of(context).scaffoldBackgroundColor,
-                locale: 'en_US',
-                daysCount: 14,
-                onDateChange: (date) {
-                  setState(() {
-                    _selectedDate = date;
-                    _calendarController.displayDate = _selectedDate;
-                  });
-                },
+              child: Container(
+                padding: EdgeInsets.all(screenWidth * 0.03),
+                child: DatePicker(
+                  DateTime.now(),
+                  controller: _datePickerController,
+                  height: screenHeight * 0.15,
+                  width: screenWidth * 0.15,
+                  initialSelectedDate: _selectedDate,
+                  selectionColor: Theme.of(context).secondaryHeaderColor,
+                  selectedTextColor: Theme.of(context).scaffoldBackgroundColor,
+                  locale: 'en_US',
+                  daysCount: 14,
+                  onDateChange: (date) {
+                    setState(() {
+                      _selectedDate = date;
+                      _calendarController.displayDate = _selectedDate;
+                    });
+                  },
+                ),
               ),
-            ),
             ),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(12.0),
+                padding: EdgeInsets.all(screenWidth * 0.03),
                 child: Column(
                   children: [
-                    SizedBox(
-                      height: 540,
+                    Expanded(
                       child: SfCalendar(
                         controller: _calendarController,
                         viewHeaderStyle: ViewHeaderStyle(
-                          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                          backgroundColor:
+                              Theme.of(context).scaffoldBackgroundColor,
                           dateTextStyle: TextStyle(
-                            fontSize: 16,
+                            fontSize: screenWidth * 0.04,
                             fontFamily: 'Poppins',
                             fontWeight: FontWeight.w600,
                             color: Theme.of(context).shadowColor,
                           ),
                         ),
                         headerHeight: 0,
-                        todayHighlightColor: Theme.of(context).secondaryHeaderColor,
+                        todayHighlightColor:
+                            Theme.of(context).secondaryHeaderColor,
                         view: CalendarView.day,
                         initialDisplayDate: _selectedDate,
                         initialSelectedDate: _selectedDate,
-                        dataSource: MeetingDataSource(getAppointments(_selectedDate)),
+                        dataSource:
+                            MeetingDataSource(getAppointments(_selectedDate)),
                         onViewChanged: (ViewChangedDetails details) {
                           WidgetsBinding.instance.addPostFrameCallback((_) {
                             setState(() {
                               _selectedDate = details.visibleDates[0];
-                              _datePickerController.animateToDate(_selectedDate);
+                              _datePickerController
+                                  .animateToDate(_selectedDate);
                             });
                           });
                         },
                         appointmentBuilder: (context, details) {
-                        final Appointment appointment = details.appointments.first;
+                          final Appointment appointment =
+                              details.appointments.first;
                           return Material(
                             elevation: 4,
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius:
+                                BorderRadius.circular(screenWidth * 0.03),
                             color: const Color.fromARGB(255, 255, 255, 255),
                             child: Container(
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius:
+                                    BorderRadius.circular(screenWidth * 0.03),
                               ),
                               child: Center(
                                 child: Text(
                                   appointment.subject,
                                   style: TextStyle(
                                     color: Theme.of(context).hintColor,
-                                    fontSize: 14,
+                                    fontSize: screenWidth * 0.035,
                                     fontFamily: 'Poppins',
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -106,10 +116,11 @@ class _ProfessorPage3State extends State<ProfessorPage3> {
                           endHour: 20,
                           timeInterval: Duration(minutes: 60),
                           timeFormat: 'h:mm a',
-                          timeIntervalHeight: 80,
-                          allDayPanelColor: Theme.of(context).scaffoldBackgroundColor,
+                          timeIntervalHeight: screenHeight * 0.1,
+                          allDayPanelColor:
+                              Theme.of(context).scaffoldBackgroundColor,
                           timeTextStyle: TextStyle(
-                            fontSize: 10,
+                            fontSize: screenWidth * 0.03,
                             fontFamily: 'Poppins',
                             fontWeight: FontWeight.w600,
                             color: Theme.of(context).shadowColor,
@@ -117,7 +128,7 @@ class _ProfessorPage3State extends State<ProfessorPage3> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 10.0),
+                    SizedBox(height: screenHeight * 0.01),
                   ],
                 ),
               ),
@@ -129,14 +140,14 @@ class _ProfessorPage3State extends State<ProfessorPage3> {
   }
 }
 
-
 // Dummy data for appointments
 // You can replace this with your own data source
 // or fetch data from an API
 List<Appointment> getAppointments(DateTime selectedDate) {
   List<Appointment> meetings = <Appointment>[];
   final DateTime today = DateTime.now();
-  final DateTime startTime = DateTime(today.year, today.month, today.day, 17, 0, 0);
+  final DateTime startTime =
+      DateTime(today.year, today.month, today.day, 17, 0, 0);
   final DateTime endTime = startTime.add(Duration(minutes: 29));
   meetings.add(Appointment(
     startTime: startTime,
