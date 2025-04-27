@@ -248,3 +248,17 @@ async def set_or_append_available_time(payload: Avaliable):
             course_code=course_code,
             time=time
         )
+    
+@app.get("/getClassTimeAvailable", response_model=Avaliable)
+async def get_available_time(course_code: str):
+    existing = time_avaliable_collection.find_one({"course_code": course_code})
+    if existing:
+        return Avaliable(
+            course_code=course_code,
+            time=existing.get("time", [])
+        )
+    else:
+        return Avaliable(
+            course_code=course_code,
+            time=[]
+        )

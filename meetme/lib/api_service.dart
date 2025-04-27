@@ -244,4 +244,22 @@ class ApiService {
       throw Exception('Failed to set available time: ${response.body}');
     }
   }
+
+  static Future<List<String>> getAvaliableTime(String courseCode) async {
+    final token = await _getToken();
+    final response = await http.get(
+      Uri.parse('$baseUrl/getClassTimeAvailable?course_code=$courseCode'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to get available time: ${response.body}');
+    }
+
+    final Map<String, dynamic> responseData = jsonDecode(response.body);
+    return List<String>.from(responseData['time']);
+  }
 }

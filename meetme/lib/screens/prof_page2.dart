@@ -11,7 +11,6 @@ class ProfessorPage2 extends StatefulWidget {
 
 class _ProfessorPage2State extends State<ProfessorPage2> {
   List<Map<String, dynamic>> _classList = [];
-  List<Map<String, dynamic>> _filteredClassList = [];
   bool _isLoading = true;
 
   Color _getClassColor(String className) {
@@ -42,7 +41,6 @@ class _ProfessorPage2State extends State<ProfessorPage2> {
 
       setState(() {
         _classList = classes;
-        _filteredClassList = classes;
         _isLoading = false;
       });
     } catch (e) {
@@ -61,30 +59,47 @@ class _ProfessorPage2State extends State<ProfessorPage2> {
   }
 
   Future<void> _appointmentAdder(
-      BuildContext context, Map<String, dynamic> classInfo) {
+      BuildContext context, Map<String, dynamic> classInfo) async {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-    DateTime selectedDate = DateTime.now();
     Set<TimeOfDay> selectedTimes = {};
+
+    // Fetch available times for this class
+    try {
+      final availableTimes =
+          await ApiService.getAvaliableTime(classInfo['course_code']);
+      if (availableTimes.isNotEmpty) {
+        selectedTimes = availableTimes.map((timeStr) {
+          // Convert string time to TimeOfDay
+          final parts = timeStr.split(':');
+          return TimeOfDay(
+              hour: int.parse(parts[0]), minute: int.parse(parts[1]));
+        }).toSet();
+      }
+    } catch (e) {}
 
     return showDialog<void>(
         context: context,
         builder: (BuildContext context) {
           return StatefulBuilder(
             builder: (context, setStateDialog) {
+              // Create a local copy of selectedTimes for the dialog
+              final dialogSelectedTimes = Set<TimeOfDay>.from(selectedTimes);
+
               return AlertDialog(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(screenWidth * 0.03),
                 ),
                 backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                 title: Text(
-                  'Available Time for Appointment',
+                  'Available Time',
                   style: TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: screenWidth * 0.05,
                     fontWeight: FontWeight.bold,
                     color: Theme.of(context).shadowColor,
                   ),
+                  textAlign: TextAlign.center,
                 ),
                 content: SingleChildScrollView(
                   child: Column(
@@ -100,7 +115,7 @@ class _ProfessorPage2State extends State<ProfessorPage2> {
                       ),
                       SizedBox(height: screenHeight * 0.01),
                       Wrap(
-                        spacing: screenWidth * 0.02,
+                        spacing: screenWidth * 0.015,
                         runSpacing: screenHeight * 0.005,
                         children: List.generate(16, (index) {
                           final startTime = TimeOfDay(
@@ -109,13 +124,19 @@ class _ProfessorPage2State extends State<ProfessorPage2> {
                           final endTime = TimeOfDay(
                               hour: startTime.hour,
                               minute: startTime.minute + 29);
+
                           // Check if this time is in our selected times
-                          final isSelected = selectedTimes.contains(startTime);
+                          final isSelected = selectedTimes.any((time) =>
+                              time.hour == startTime.hour &&
+                              time.minute == startTime.minute);
+
                           return ElevatedButton(
                             onPressed: () {
                               setStateDialog(() {
                                 if (isSelected) {
-                                  selectedTimes.remove(startTime);
+                                  selectedTimes.removeWhere((time) =>
+                                      time.hour == startTime.hour &&
+                                      time.minute == startTime.minute);
                                 } else {
                                   selectedTimes.add(startTime);
                                 }
@@ -136,17 +157,17 @@ class _ProfessorPage2State extends State<ProfessorPage2> {
                               '${(startTime.hour > 12 ? '0' : '')}${startTime.format(context).replaceFirst(' AM', '').replaceFirst(' PM', '')} - ${(endTime.hour > 12 ? '0' : '')}${endTime.format(context).replaceFirst(' AM', 'am').replaceFirst(' PM', 'pm')}',
                               style: TextStyle(
                                 fontFamily: 'Poppins',
-                                fontSize: screenWidth * 0.035,
+                                fontSize: screenWidth * 0.025,
                               ),
                             ),
                           );
                         }),
                       ),
-                      if (selectedTimes.isNotEmpty)
+                      if (dialogSelectedTimes.isNotEmpty)
                         Padding(
                           padding: EdgeInsets.only(top: screenHeight * 0.02),
                           child: Text(
-                            '${selectedTimes.length} time slots selected',
+                            '${dialogSelectedTimes.length} time slots selected',
                             style: TextStyle(
                               fontFamily: 'Poppins',
                               fontSize: screenWidth * 0.04,
@@ -183,7 +204,8 @@ class _ProfessorPage2State extends State<ProfessorPage2> {
                     ),
                     onPressed: () async {
                       // Convert selectedTimes (TimeOfDay) to List<String> like '08:00am'
-                      List<String> timeStrings = selectedTimes.map((time) {
+                      List<String> timeStrings =
+                          dialogSelectedTimes.map((time) {
                         final now = DateTime.now();
                         final dt = DateTime(now.year, now.month, now.day,
                             time.hour, time.minute);

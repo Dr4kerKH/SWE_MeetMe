@@ -460,8 +460,8 @@ class _ProfessorPage1State extends State<ProfessorPage1> {
                                   context,
                                   classInfo['course_name'] ?? '',
                                   classInfo['professor_name'] ?? '',
-                                  classInfo['join_code'] ?? '',
-                                  classInfo['description'] ?? '',
+                                  classInfo['course_code'] ?? '',
+                                  classInfo['course_description'] ?? '',
                                 ),
                               ),
                             );
