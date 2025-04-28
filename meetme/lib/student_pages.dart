@@ -134,7 +134,7 @@ class _HomePageState extends State<StudentHomePage> {
               iconColor: Theme.of(context).hintColor,
             ),
             GButton(
-              icon: Icons.web,
+              icon: Icons.bento_rounded,
               iconSize: screenWidth * 0.07,
               iconActiveColor: Theme.of(context).shadowColor,
               iconColor: Theme.of(context).hintColor,

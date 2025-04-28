@@ -2,13 +2,13 @@
 import logging
 import os
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends, WebSocket, WebSocketDisconnect
 from pymongo import MongoClient
 from pymongo.server_api import ServerApi
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from datetime import datetime, timedelta
 from passlib.context import CryptContext
-from typing import List
+from typing import List, Dict
 import jwt
 from bson import ObjectId
 import random
@@ -18,11 +18,42 @@ from model import (
     User, UserResponse, Appointment, AppointmentResponse,
     Class, ClassResponse, UserLogin, Enrollment, EnrollmentResponse, Avaliable, AvaliableResponse
 )
+# For WebSockets
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections: Dict[str, List[WebSocket]] = {}
+
+    async def connect(self, websocket: WebSocket, user_id: str):
+        await websocket.accept()
+        if user_id not in self.active_connections:
+            self.active_connections[user_id] = []
+        self.active_connections[user_id].append(websocket)
+        logging.info(f"🔌 User connected: {user_id}")
+
+    def disconnect(self, websocket: WebSocket, user_id: str):
+        if user_id in self.active_connections:
+            self.active_connections[user_id].remove(websocket)
+            if not self.active_connections[user_id]:
+                del self.active_connections[user_id]
+        logging.info(f"❌ User disconnected: {user_id}")
+
+    async def send_personal_message(self, message: str, user_id: str):
+        if user_id in self.active_connections:
+            for connection in self.active_connections[user_id]:
+                await connection.send_text(message)
+
+    async def broadcast(self, message: str):
+        for conns in self.active_connections.values():
+            for connection in conns:
+                await connection.send_text(message)
+
+manager = ConnectionManager()
 
 # Load env variables
 load_dotenv()
 app = FastAPI()
 logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 ############################ Database Connection ############################
 MONGODB_URI = os.getenv("MONGODB_URI")
@@ -41,11 +72,17 @@ appointments_collection = db['appointments']
 classes_collection = db['classes']
 enroll_collection = db['enrollments']
 time_avaliable_collection = db ['time_avaliable']
+chat_messages_collection = db["chat_messages"]
+notifications_collection = db["notifications"]
 
 ############################ Security Setup ############################
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 ALGORITHM = "HS256"
+
+@app.on_event("startup")
+async def startup_event():
+    logger.info("🚀 FastAPI server starting up...")
 
 ############################ Helper Functions ############################
 def verify_password(plain_password, hashed_password):
@@ -223,19 +260,15 @@ async def set_or_append_available_time(payload: Avaliable):
 
     existing = time_avaliable_collection.find_one({"course_code": course_code})
     if existing:
-        existing_times = set(existing.get("time", []))
-        new_times = set(time)
-        updated_times = list(existing_times.union(new_times))
-
         time_avaliable_collection.update_one(
             {"course_code": course_code},
-            {"$set": {"time": sorted(updated_times)}}
+            {"$set": {"time": sorted(time)}}
         )
 
         return AvaliableResponse(
             id=str(existing["_id"]),
             course_code=course_code,
-            time=sorted(updated_times)
+            time=sorted(time)
         )
     else:
         time_avaliable = {
@@ -262,3 +295,65 @@ async def get_available_time(course_code: str):
             course_code=course_code,
             time=[]
         )
+    
+
+@app.websocket("/ws/{user_id}")
+async def websocket_endpoint(websocket: WebSocket, user_id: str):
+    await manager.connect(websocket, user_id)
+    try:
+        while True:
+            data = await websocket.receive_text()
+            logging.info(f"📩 Message from {user_id}: {data}")
+            # Example: Echo message back to sender (can enhance later)
+            await manager.send_personal_message(f"You said: {data}", user_id)
+    except WebSocketDisconnect:
+        manager.disconnect(websocket, user_id)
+
+connected_users: Dict[str, WebSocket] = {}
+
+@app.websocket("/ws/chat/{user_id}")
+async def websocket_endpoint(websocket: WebSocket, user_id: str):
+    await websocket.accept()
+    connected_users[user_id] = websocket
+    try:
+        while True:
+            data = await websocket.receive_json()
+            # Save to MongoDB
+            chat_messages_collection.insert_one({
+                "sender_id": data["sender_id"],
+                "receiver_id": data["receiver_id"],
+                "message": data["message"],
+                "timestamp": datetime.utcnow().isoformat()
+            })
+
+            # Forward message to recipient if connected
+            receiver_ws = connected_users.get(data["receiver_id"])
+            if receiver_ws:
+                await receiver_ws.send_json(data)
+    except WebSocketDisconnect:
+        connected_users.pop(user_id, None)
+
+@app.get("/chat/history")
+def get_chat_history(user1: str, user2: str):
+    messages = list(chat_messages_collection.find({
+        "$or": [
+            {"sender_id": user1, "receiver_id": user2},
+            {"sender_id": user2, "receiver_id": user1},
+        ]
+    }).sort("timestamp", 1))
+
+    for msg in messages:
+        msg["id"] = str(msg["_id"])
+        del msg["_id"]
+    return messages
+
+@app.get("/notifications/{email}")
+async def get_notifications(email: str):
+    raw_notifications = notifications_collection.find({"recipient_email": email}).sort("timestamp", -1)
+    
+    notifications = []
+    for n in raw_notifications:
+        n["_id"] = str(n["_id"])  # Convert ObjectId to string
+        notifications.append(n)
+    
+    return notifications

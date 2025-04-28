@@ -62,7 +62,7 @@ class _ProfessorPage2State extends State<ProfessorPage2> {
       BuildContext context, Map<String, dynamic> classInfo) async {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-    Set<TimeOfDay> selectedTimes = {};
+    List<TimeOfDay> selectedTimes = [];
 
     // Fetch available times for this class
     try {
@@ -70,11 +70,16 @@ class _ProfessorPage2State extends State<ProfessorPage2> {
           await ApiService.getAvaliableTime(classInfo['course_code']);
       if (availableTimes.isNotEmpty) {
         selectedTimes = availableTimes.map((timeStr) {
-          // Convert string time to TimeOfDay
-          final parts = timeStr.split(':');
-          return TimeOfDay(
-              hour: int.parse(parts[0]), minute: int.parse(parts[1]));
-        }).toSet();
+          // Convert string time like "1:00pm" to TimeOfDay
+          final time = timeStr.toLowerCase();
+          final isPM = time.contains('pm');
+          final parts =
+              time.replaceAll('pm', '').replaceAll('am', '').split(':');
+          int hour = int.parse(parts[0]);
+          if (isPM && hour != 12) hour += 12;
+          if (!isPM && hour == 12) hour = 0;
+          return TimeOfDay(hour: hour, minute: int.parse(parts[1]));
+        }).toList();
       }
     } catch (e) {}
 
@@ -84,7 +89,7 @@ class _ProfessorPage2State extends State<ProfessorPage2> {
           return StatefulBuilder(
             builder: (context, setStateDialog) {
               // Create a local copy of selectedTimes for the dialog
-              final dialogSelectedTimes = Set<TimeOfDay>.from(selectedTimes);
+              final dialogSelectedTimes = List<TimeOfDay>.from(selectedTimes);
 
               return AlertDialog(
                 shape: RoundedRectangleBorder(
@@ -129,6 +134,10 @@ class _ProfessorPage2State extends State<ProfessorPage2> {
                           final isSelected = selectedTimes.any((time) =>
                               time.hour == startTime.hour &&
                               time.minute == startTime.minute);
+                          final wasPreviouslySelected = dialogSelectedTimes.any(
+                              (time) =>
+                                  time.hour == startTime.hour &&
+                                  time.minute == startTime.minute);
 
                           return ElevatedButton(
                             onPressed: () {
@@ -143,9 +152,11 @@ class _ProfessorPage2State extends State<ProfessorPage2> {
                               });
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: isSelected
+                              backgroundColor: wasPreviouslySelected
                                   ? Theme.of(context).secondaryHeaderColor
-                                  : Theme.of(context).hintColor,
+                                  : isSelected
+                                      ? Theme.of(context).secondaryHeaderColor
+                                      : Theme.of(context).hintColor,
                               foregroundColor:
                                   Theme.of(context).scaffoldBackgroundColor,
                               shape: RoundedRectangleBorder(
@@ -214,6 +225,39 @@ class _ProfessorPage2State extends State<ProfessorPage2> {
                             .replaceFirst(' AM', 'am')
                             .replaceFirst(' PM', 'pm');
                       }).toList();
+
+                      // Sort the time strings chronologically
+                      timeStrings.sort((a, b) {
+                        final timeA = a.toLowerCase();
+                        final timeB = b.toLowerCase();
+                        final isPMA = timeA.contains('pm');
+                        final isPMB = timeB.contains('pm');
+
+                        // Remove am/pm and split into hours and minutes
+                        final partsA = timeA
+                            .replaceAll('pm', '')
+                            .replaceAll('am', '')
+                            .split(':');
+                        final partsB = timeB
+                            .replaceAll('pm', '')
+                            .replaceAll('am', '')
+                            .split(':');
+
+                        int hourA = int.parse(partsA[0]);
+                        int hourB = int.parse(partsB[0]);
+
+                        // Convert to 24-hour format for comparison
+                        if (isPMA && hourA != 12) hourA += 12;
+                        if (isPMB && hourB != 12) hourB += 12;
+                        if (!isPMA && hourA == 12) hourA = 0;
+                        if (!isPMB && hourB == 12) hourB = 0;
+
+                        // Compare hours first, then minutes
+                        if (hourA != hourB) return hourA.compareTo(hourB);
+                        return int.parse(partsA[1])
+                            .compareTo(int.parse(partsB[1]));
+                      });
+
                       await ApiService.setAvaliableTime(
                         classInfo['course_code'],
                         timeStrings,
@@ -296,25 +340,23 @@ class _ProfessorPage2State extends State<ProfessorPage2> {
                                 borderRadius:
                                     BorderRadius.circular(screenWidth * 0.03),
                               ),
+                              color: _getClassColor(cls['course_name'] ?? ''),
                               child: ListTile(
-                                leading: CircleAvatar(
-                                  backgroundColor:
-                                      _getClassColor(cls['course_name'] ?? ''),
-                                  radius: screenWidth * 0.08,
-                                ),
                                 title: Text(
-                                  cls['course_name'] ?? 'Unnamed Class',
+                                  cls['course_name'] ?? '',
                                   style: TextStyle(
-                                    fontSize: screenWidth * 0.045,
                                     fontFamily: 'Poppins',
+                                    fontSize: screenWidth * 0.045,
                                     fontWeight: FontWeight.bold,
+                                    color: Colors.white,
                                   ),
                                 ),
                                 subtitle: Text(
-                                  cls['professor_name'] ?? 'Unknown Professor',
+                                  'By ${cls['professor_name'] ?? ''}',
                                   style: TextStyle(
-                                    fontSize: screenWidth * 0.035,
                                     fontFamily: 'Poppins',
+                                    fontSize: screenWidth * 0.035,
+                                    color: Colors.white.withOpacity(0.8),
                                   ),
                                 ),
                                 onTap: () => _appointmentAdder(context, cls),
