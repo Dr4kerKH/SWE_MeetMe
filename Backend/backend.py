@@ -82,7 +82,7 @@ ALGORITHM = "HS256"
 
 @app.on_event("startup")
 async def startup_event():
-    logger.info("🚀 FastAPI server starting up...")
+    logger.info("   FastAPI server starting up...   🚀🚀🚀🚀🚀")
 
 ############################ Helper Functions ############################
 def verify_password(plain_password, hashed_password):
